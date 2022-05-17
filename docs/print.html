@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -135,7 +135,87 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>This guide introduces developers to Bevy's ECS component, by porting the game written for <a href="https://pragprog.com/titles/hwrust/hands-on-rust">Hands-on Rust: Effective Learning through 2D Game Development and Play</a> to Bevy's ECS.</p>
+<h2 id="how-to-approach-this-book"><a class="header" href="#how-to-approach-this-book">How to approach this book</a></h2>
+<p>The book (and the <a href="https://github.com/thebracket/HandsOnRust">source project</a>) are structured as a series of incremental steps, leading to a full game.</p>
+<p>In the <a href="https://github.com/64kramsystem/rust-game-ports">Rust ports repository</a>, I've made minor cleanups and restructures to the source project; the locations of the projects are:</p>
+<ul>
+<li><a href="https://github.com/64kramsystem/rust-game-ports/tree/master/rusty_roguelike-bevy">port project</a></li>
+<li><a href="https://github.com/64kramsystem/rust-game-ports/tree/master/source_projects/rusty_roguelike">source project</a></li>
+</ul>
+<p>The steps have been numbered (and have matching names in the source/port), in order to facilitate sequential examination and comparison.</p>
+<p>This book presents multiple chapters for each step, explaining the concepts involved. When reading a chapter, one can compare the source step with the ported one, and/or with the previous step in the respective project.</p>
+<p>The starting chapter is 06.01, where an ECS is introduced in the design.</p>
+<p>It's technically possible to read this book standalone, without the source one, but for newcomers to ECS, it's not advised, as this book won't explain the ECS concepts (only their Bevy API implementation).</p>
+<h2 id="references"><a class="header" href="#references">References</a></h2>
+<p>The Bevy used version is 0.7.0; all the API links refer to the tag <code>v0.7.0</code> in <a href="https://github.com/bevyengine/bevy">Bevy's repository</a>.</p>
+<h2 id="port-style"><a class="header" href="#port-style">Port style</a></h2>
+<p>Since comparison is a foundation of this book, I've maintained high and low-level structures as similar as I could; the most radical divergence is due to Bevy's state management. There are still a few differences, but they're minor.</p>
+<h2 id="thanks"><a class="header" href="#thanks">Thanks</a></h2>
+<p>This project has been kindly sponsored by <a href="https://www.ticketsolve.com">Ticketsolve</a>; naturally, it wouldn't have been possible without the great work of <a href="https://twitter.com/herberticus">Herbert Wolverson</a>, and the <a href="https://bevyengine.org">Bevy</a> community.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="base-structure"><a class="header" href="#base-structure">Base structure</a></h1>
+<p>The very first step in the port is plugging Bevy's ECS. The source project has a mixed, game engine-wise, design:</p>
+<ul>
+<li>the game loop is managed by the game engine (<a href="https://github.com/amethyst/bracket-lib">bracket-lib</a>);</li>
+<li>for each cycle (frame), an update is invoked on the ECS (<a href="https://github.com/amethyst/legion">Legion</a>).</li>
+</ul>
+<p>This is bare-bones structure of the source project:</p>
+<pre><code class="language-rs">struct State {
+    ecs: World,
+    resources: Resources,
+    systems: Schedule,
+}
+
+impl State {
+    fn new() -&gt; Self {
+        // [...]
+        Self {
+            ecs: World::default(),
+            resources: Resources::default(),
+            systems: build_scheduler(),
+        }
+    }
+}
+
+impl GameState for State {
+    fn tick(&amp;mut self, ctx: &amp;mut BTerm) {
+        // [...]
+        self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
+        render_draw_buffer(ctx).expect(&quot;Render error&quot;);
+    }
+}
+
+fn main() -&gt; BError {
+    // [...]
+    main_loop(context, State::new())
+}
+</code></pre>
+<p>The translation is straightforward:</p>
+<ul>
+<li><code>World</code> and <code>Resources</code> map to <a href="https://github.com/bevyengine/bevy/blob/83c6ffb73c4a91182cda10141f824987ef3fba2f/crates/bevy_app/src/app.rs#L46"><code>App</code></a> (which also owns the resources)</li>
+<li>Legion's systems update for each tick maps to the <a href="https://github.com/bevyengine/bevy/blob/83c6ffb73c4a91182cda10141f824987ef3fba2f/crates/bevy_app/src/app.rs#L111"><code>App#update()</code> API</a>.</li>
+</ul>
+<p>leading to:</p>
+<pre><code class="language-rs">struct State {
+    ecs: App,
+}
+
+impl State {
+    fn new() -&gt; Self {
+        // [...]
+        Self { ecs: App::new() }
+    }
+}
+
+impl GameState for State {
+    fn tick(&amp;mut self, ctx: &amp;mut BTerm) {
+        // [...]
+        self.ecs.update();
+        render_draw_buffer(ctx).expect(&quot;Render error&quot;);
+    }
+}
+</code></pre>
 
                     </main>
 
@@ -151,6 +231,20 @@
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
