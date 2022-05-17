@@ -1,0 +1,9 @@
+[book]
+authors = ["Saverio Miroddi"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Learn Bevy's ECS by ripping off someone else's project"
+
+[build]
+build-dir = "docs"
