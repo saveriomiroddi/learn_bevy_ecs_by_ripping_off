@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_and_resources.html"><strong aria-hidden="true">4.</strong> Components and resources</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -161,7 +161,9 @@
 <li>for each cycle (frame), an update is invoked on the ECS (<a href="https://github.com/amethyst/legion">Legion</a>).</li>
 </ul>
 <p>This is bare-bones structure of the source project:</p>
-<pre><code class="language-rs">struct State {
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
+struct State {
     ecs: World,
     resources: Resources,
     systems: Schedule,
@@ -197,7 +199,9 @@ fn main() -&gt; BError {
 <li>Legion's systems update for each tick maps to the <a href="https://github.com/bevyengine/bevy/blob/83c6ffb73c4a91182cda10141f824987ef3fba2f/crates/bevy_app/src/app.rs#L111"><code>App#update()</code> API</a>.</li>
 </ul>
 <p>leading to:</p>
-<pre><code class="language-rs">struct State {
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
+struct State {
     ecs: App,
 }
 
@@ -216,6 +220,57 @@ impl GameState for State {
     }
 }
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="world-and-systems"><a class="header" href="#world-and-systems">World and systems</a></h1>
+<h2 id="world"><a class="header" href="#world">World</a></h2>
+<p>In Legion, we work directly on <code>World</code> and <code>Resources</code>:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
+let mut ecs = World::default();
+let mut resources = Resources::default();
+
+// [...]
+
+self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
+</code></pre>
+<p>In Bevy, the semantics are different, and the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
+<p>We still can manipulate <code>World</code>, just as long as we're aware that accessing it mutably, prevents systems from running. In the ported project, in order to maintain the structure similar to the source, I've intentionally done it:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+
+// The world instance is accessible via App#world.
+//
+world.spawn().insert_bundle((
+    Player,
+    PointC(pos),
+    Render {
+        color: ColorPair::new(WHITE, BLACK),
+        glyph: to_cp437('@'),
+    },
+));
+</code></pre>
+<p>Generally speaking, while one can use this approach, in particular in stages where performance is not a concern, using systems should be preferred.</p>
+<h2 id="systems"><a class="header" href="#systems">Systems</a></h2>
+<p>WRITEME</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="components-and-resources"><a class="header" href="#components-and-resources">Components and Resources</a></h1>
+<h2 id="components"><a class="header" href="#components">Components</a></h2>
+<p>In Bevy, components must derive <code>Component</code>:</p>
+<pre><code class="language-rs">#[derive(Component)]
+pub struct Render {
+    pub color: ColorPair,
+    pub glyph: FontCharType,
+}
+
+#[derive(Component)]
+pub struct Player;
+
+#[derive(Component)]
+pub struct PointC(pub Point);
+</code></pre>
+<p>There's something interesting here: <code>PointC</code>, which is a tuple struct, unlike the other (regular) structs.</p>
+<p>Why so? Because the type <code>Point</code> is not defined in our crate, and therefore, can't derive <code>Component</code>; in order to work this problem around, we wrap it in our type (<code>PointC</code>), and derive the wrapping type.</p>
+<h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
+<p>Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource:</p>
+<pre><code class="language-rs">// WRITEME
+</code></pre>
 
                     </main>
 
@@ -231,20 +286,6 @@ impl GameState for State {
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
