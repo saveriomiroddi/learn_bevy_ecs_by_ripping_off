@@ -8,6 +8,8 @@ The very first step in the port is plugging Bevy's ECS. The source project has a
 This is bare-bones structure of the source project:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
 struct State {
     ecs: World,
     resources: Resources,
@@ -47,6 +49,8 @@ The translation is straightforward:
 leading to:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
 struct State {
     ecs: App,
 }
