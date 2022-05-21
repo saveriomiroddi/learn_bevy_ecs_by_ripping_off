@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_and_resources.html" class="active"><strong aria-hidden="true">4.</strong> Components and resources</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_and_resources.html" class="active"><strong aria-hidden="true">4.</strong> Components and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -137,7 +137,9 @@
                         <h1 id="components-and-resources"><a class="header" href="#components-and-resources">Components and Resources</a></h1>
 <h2 id="components"><a class="header" href="#components">Components</a></h2>
 <p>In Bevy, components must derive <code>Component</code>:</p>
-<pre><code class="language-rs">#[derive(Component)]
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: component.rs
+
+#[derive(Component)]
 pub struct Render {
     pub color: ColorPair,
     pub glyph: FontCharType,
@@ -152,9 +154,21 @@ pub struct PointC(pub Point);
 <p>There's something interesting here: <code>PointC</code>, which is a tuple struct, unlike the other (regular) structs.</p>
 <p>Why so? Because the type <code>Point</code> is not defined in our crate, and therefore, can't derive <code>Component</code>; in order to work this problem around, we wrap it in our type (<code>PointC</code>), and derive the wrapping type.</p>
 <h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
-<p>Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource:</p>
-<pre><code class="language-rs">// WRITEME
+<p>Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource.</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
+// key is a bracket-lib `VirtualKeyCode` type
+// ecs is the Bevy `App` instance
+//
+if let Some(key) = ctx.key {
+    self.ecs.insert_resource(key);
+} else {
+    self.ecs.world.remove_resource::&lt;VirtualKeyCode&gt;();
+}
 </code></pre>
+<p>Since there can be only one resource for a given type, when a resource is inserted, any existing resource with the same type is going to be overwritten.</p>
+<p>Note how int the example above, we remove a resource through <code>World</code>; while this is acceptable, we should strive to use systems where possible. The technical reason for this usage is that Bevy provides resource insertion via the <code>App</code> instance, but not the removal. This makes sense architecturally, since in the initialization of a project, one insert resources rather than removing them.</p>
+<p>In the next chapters, we'll see how to access resources in systems.</p>
 
                     </main>
 
@@ -162,6 +176,9 @@ pub struct PointC(pub Point);
                         <!-- Mobile navigation buttons -->
                             <a rel="prev" href="../06_01/world_and_systems.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="../06_01/keyboard_input.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -172,10 +189,27 @@ pub struct PointC(pub Point);
                     <a rel="prev" href="../06_01/world_and_systems.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
+                    <a rel="next" href="../06_01/keyboard_input.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>

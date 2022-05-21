@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_and_resources.html"><strong aria-hidden="true">4.</strong> Components and resources</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_and_resources.html"><strong aria-hidden="true">4.</strong> Components and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -138,8 +138,8 @@
                         <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <p>This guide introduces developers to Bevy's ECS component, by porting the game written for <a href="https://pragprog.com/titles/hwrust/hands-on-rust">Hands-on Rust: Effective Learning through 2D Game Development and Play</a> to Bevy's ECS.</p>
 <h2 id="how-to-approach-this-book"><a class="header" href="#how-to-approach-this-book">How to approach this book</a></h2>
-<p>The book (and the <a href="https://github.com/thebracket/HandsOnRust">source project</a>) are structured as a series of incremental steps, leading to a full game.</p>
-<p>In the <a href="https://github.com/64kramsystem/rust-game-ports">Rust ports repository</a>, I've made minor cleanups and restructures to the source project; the locations of the projects are:</p>
+<p>The book, and the <a href="https://github.com/thebracket/HandsOnRust">source project</a>, are structured as a series of incremental steps, leading to a full game.</p>
+<p>In the <a href="https://github.com/64kramsystem/rust-game-ports">Rust ports repository</a>, I've made minor cleanups and restructurings to the source project; the locations of the projects are:</p>
 <ul>
 <li><a href="https://github.com/64kramsystem/rust-game-ports/tree/master/rusty_roguelike-bevy">port project</a></li>
 <li><a href="https://github.com/64kramsystem/rust-game-ports/tree/master/source_projects/rusty_roguelike">source project</a></li>
@@ -147,7 +147,7 @@
 <p>The steps have been numbered (and have matching names in the source/port), in order to facilitate sequential examination and comparison.</p>
 <p>This book presents multiple chapters for each step, explaining the concepts involved. When reading a chapter, one can compare the source step with the ported one, and/or with the previous step in the respective project.</p>
 <p>The starting chapter is 06.01, where an ECS is introduced in the design.</p>
-<p>It's technically possible to read this book standalone, without the source one, but for newcomers to ECS, it's not advised, as this book won't explain the ECS concepts (only their Bevy API implementation).</p>
+<p>It's technically possible to read this book standalone, without the source one, but for newcomers to ECS, it's not advised, as in this context I'm not explaining the ECS concepts (only their Bevy API implementation).</p>
 <h2 id="references"><a class="header" href="#references">References</a></h2>
 <p>The Bevy used version is 0.7.0; all the API links refer to the tag <code>v0.7.0</code> in <a href="https://github.com/bevyengine/bevy">Bevy's repository</a>.</p>
 <h2 id="port-style"><a class="header" href="#port-style">Port style</a></h2>
@@ -232,7 +232,7 @@ let mut resources = Resources::default();
 
 self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
 </code></pre>
-<p>In Bevy, the semantics are different, and the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
+<p>In Bevy, the semantics are similar, although the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
 <p>We still can manipulate <code>World</code>, just as long as we're aware that accessing it mutably, prevents systems from running. In the ported project, in order to maintain the structure similar to the source, I've intentionally done it:</p>
 <pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
 
@@ -249,11 +249,73 @@ world.spawn().insert_bundle((
 </code></pre>
 <p>Generally speaking, while one can use this approach, in particular in stages where performance is not a concern, using systems should be preferred.</p>
 <h2 id="systems"><a class="header" href="#systems">Systems</a></h2>
-<p>WRITEME</p>
+<p>In Legion, systems require attributes, and queries are manually invoked:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+
+#[system]
+#[read_component(Point)]
+#[read_component(Render)]
+pub fn entity_render(ecs: &amp;SubWorld, #[resource] camera: &amp;Camera) {
+    // ...
+
+    &lt;(&amp;Point, &amp;Render)&gt;::query()
+        .iter(ecs)
+        .for_each(|(pos, render)| {
+            draw_batch.set(*pos - offset, render.color, render.glyph);
+        });
+
+    // ...
+}
+</code></pre>
+<p>In Bevy, systems are simpler; they don't require attributes, and the queries are declared as function parameters:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+
+pub fn entity_render(query: Query&lt;(&amp;PointC, &amp;Render)&gt;, camera: Res&lt;Camera&gt;) {
+    // ...
+
+    for (pos, render) in query.iter() {
+        draw_batch.set(pos.0 - offset, render.color, render.glyph);
+    }
+
+    // ...
+}
+</code></pre>
+<p>In this example, we perform two accesses:</p>
+<ul>
+<li>we query entities, via <code>Query</code> type; in this case, entities with <code>PointC</code> and <code>Render</code> components</li>
+<li>we retrieve a <code>Camera</code> resource, via <code>Res</code> (readonly access) type</li>
+</ul>
+<p>Another fundamental API component is <code>Commands</code>, which is used primarly to add/remove entities and resources.</p>
+<p>The following example shows other functionalities:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+
+pub fn player_input(
+    mut commands: Commands,
+    mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;,
+    (map, key, mut camera): (Res&lt;Map&gt;, Option&lt;Res&lt;VirtualKeyCode&gt;&gt;, ResMut&lt;Camera&gt;),
+) {
+  // ...
+}
+</code></pre>
+<p>There are a few new concepts here (besides <code>Commands</code>):</p>
+<ol>
+<li><code>With</code>: query entities with a certain component, without retrieving it</li>
+<li><code>ResMut</code>: mutably access a resource</li>
+<li><code>Option&lt;Res&gt;</code>: access a resource that may not be existing</li>
+</ol>
+<p>Note how <code>Option&lt;Res&lt;T&gt;&gt;</code> is semantically different from <code>Res&lt;Option&lt;T&gt;&gt;</code>:</p>
+<ol>
+<li><code>Option&lt;Res&lt;T&gt;&gt;</code> is a resource of type <code>T</code> that may not be stored</li>
+<li><code>Res&lt;Option&lt;T&gt;&gt;</code> is a resource of type <code>&lt;Option&lt;T&gt;&gt;</code> that is assumed to be stored</li>
+</ol>
+<p>if a resource is not stored, the system will panic in the second case, but not the first.</p>
+<p>Querying will be explored more in detail in the next chapters.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="components-and-resources"><a class="header" href="#components-and-resources">Components and Resources</a></h1>
 <h2 id="components"><a class="header" href="#components">Components</a></h2>
 <p>In Bevy, components must derive <code>Component</code>:</p>
-<pre><code class="language-rs">#[derive(Component)]
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: component.rs
+
+#[derive(Component)]
 pub struct Render {
     pub color: ColorPair,
     pub glyph: FontCharType,
@@ -268,9 +330,43 @@ pub struct PointC(pub Point);
 <p>There's something interesting here: <code>PointC</code>, which is a tuple struct, unlike the other (regular) structs.</p>
 <p>Why so? Because the type <code>Point</code> is not defined in our crate, and therefore, can't derive <code>Component</code>; in order to work this problem around, we wrap it in our type (<code>PointC</code>), and derive the wrapping type.</p>
 <h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
-<p>Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource:</p>
-<pre><code class="language-rs">// WRITEME
+<p>Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource.</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
+// key is a bracket-lib `VirtualKeyCode` type
+// ecs is the Bevy `App` instance
+//
+if let Some(key) = ctx.key {
+    self.ecs.insert_resource(key);
+} else {
+    self.ecs.world.remove_resource::&lt;VirtualKeyCode&gt;();
+}
 </code></pre>
+<p>Since there can be only one resource for a given type, when a resource is inserted, any existing resource with the same type is going to be overwritten.</p>
+<p>Note how int the example above, we remove a resource through <code>World</code>; while this is acceptable, we should strive to use systems where possible. The technical reason for this usage is that Bevy provides resource insertion via the <code>App</code> instance, but not the removal. This makes sense architecturally, since in the initialization of a project, one insert resources rather than removing them.</p>
+<p>In the next chapters, we'll see how to access resources in systems.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="keyboard-input"><a class="header" href="#keyboard-input">Keyboard input</a></h1>
+<p>In Bevy, keyboard input handling is performed via resources:</p>
+<pre><code class="language-rs">fn keyboard_input(keys: Res&lt;Input&lt;KeyCode&gt;&gt;) {
+    if keys.just_pressed(KeyCode::W) { /* ... */ }
+
+    // ...
+}
+</code></pre>
+<p>In this context, we rely on bracket-lib for input handling, so the API above is not used.</p>
+<p>The only thing that needs to be kept in mind is that, in the context of the port, we need to remove the key resource:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
+// key is a bracket-lib `VirtualKeyCode` type
+//
+if let Some(key) = ctx.key {
+    self.ecs.insert_resource(key);
+} else {
+    self.ecs.world.remove_resource::&lt;VirtualKeyCode&gt;();
+}
+</code></pre>
+<p>If we forget the <code>remove_resource</code> invocation, if the player doesn't press any key, the current frame will still hold the keypress resource from the previous frame!</p>
+<p>This is not needed when using Bevy input handling; it's only necessary in the context of the port.</p>
 
                     </main>
 
@@ -286,6 +382,20 @@ pub struct PointC(pub Point);
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
