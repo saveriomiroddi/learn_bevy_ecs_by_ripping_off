@@ -4,9 +4,9 @@ This guide introduces developers to Bevy's ECS component, by porting the game wr
 
 ## How to approach this book
 
-The book (and the [source project](https://github.com/thebracket/HandsOnRust)) are structured as a series of incremental steps, leading to a full game.
+The book, and the [source project](https://github.com/thebracket/HandsOnRust), are structured as a series of incremental steps, leading to a full game.
 
-In the [Rust ports repository](https://github.com/64kramsystem/rust-game-ports), I've made minor cleanups and restructures to the source project; the locations of the projects are:
+In the [Rust ports repository](https://github.com/64kramsystem/rust-game-ports), I've made minor cleanups and restructurings to the source project; the locations of the projects are:
 
 - [port project](https://github.com/64kramsystem/rust-game-ports/tree/master/rusty_roguelike-bevy)
 - [source project](https://github.com/64kramsystem/rust-game-ports/tree/master/source_projects/rusty_roguelike)
@@ -17,7 +17,7 @@ This book presents multiple chapters for each step, explaining the concepts invo
 
 The starting chapter is 06.01, where an ECS is introduced in the design.
 
-It's technically possible to read this book standalone, without the source one, but for newcomers to ECS, it's not advised, as this book won't explain the ECS concepts (only their Bevy API implementation).
+It's technically possible to read this book standalone, without the source one, but for newcomers to ECS, it's not advised, as in this context I'm not explaining the ECS concepts (only their Bevy API implementation).
 
 ## References
 
