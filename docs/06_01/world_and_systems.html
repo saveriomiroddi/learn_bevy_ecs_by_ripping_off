@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html" class="active"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_and_resources.html"><strong aria-hidden="true">4.</strong> Components and resources</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html" class="active"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_and_resources.html"><strong aria-hidden="true">4.</strong> Components and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -146,7 +146,7 @@ let mut resources = Resources::default();
 
 self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
 </code></pre>
-<p>In Bevy, the semantics are different, and the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
+<p>In Bevy, the semantics are similar, although the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
 <p>We still can manipulate <code>World</code>, just as long as we're aware that accessing it mutably, prevents systems from running. In the ported project, in order to maintain the structure similar to the source, I've intentionally done it:</p>
 <pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
 
@@ -163,7 +163,67 @@ world.spawn().insert_bundle((
 </code></pre>
 <p>Generally speaking, while one can use this approach, in particular in stages where performance is not a concern, using systems should be preferred.</p>
 <h2 id="systems"><a class="header" href="#systems">Systems</a></h2>
-<p>WRITEME</p>
+<p>In Legion, systems require attributes, and queries are manually invoked:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+
+#[system]
+#[read_component(Point)]
+#[read_component(Render)]
+pub fn entity_render(ecs: &amp;SubWorld, #[resource] camera: &amp;Camera) {
+    // ...
+
+    &lt;(&amp;Point, &amp;Render)&gt;::query()
+        .iter(ecs)
+        .for_each(|(pos, render)| {
+            draw_batch.set(*pos - offset, render.color, render.glyph);
+        });
+
+    // ...
+}
+</code></pre>
+<p>In Bevy, systems are simpler; they don't require attributes, and the queries are declared as function parameters:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+
+pub fn entity_render(query: Query&lt;(&amp;PointC, &amp;Render)&gt;, camera: Res&lt;Camera&gt;) {
+    // ...
+
+    for (pos, render) in query.iter() {
+        draw_batch.set(pos.0 - offset, render.color, render.glyph);
+    }
+
+    // ...
+}
+</code></pre>
+<p>In this example, we perform two accesses:</p>
+<ul>
+<li>we query entities, via <code>Query</code> type; in this case, entities with <code>PointC</code> and <code>Render</code> components</li>
+<li>we retrieve a <code>Camera</code> resource, via <code>Res</code> (readonly access) type</li>
+</ul>
+<p>Another fundamental API component is <code>Commands</code>, which is used primarly to add/remove entities and resources.</p>
+<p>The following example shows other functionalities:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+
+pub fn player_input(
+    mut commands: Commands,
+    mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;,
+    (map, key, mut camera): (Res&lt;Map&gt;, Option&lt;Res&lt;VirtualKeyCode&gt;&gt;, ResMut&lt;Camera&gt;),
+) {
+  // ...
+}
+</code></pre>
+<p>There are a few new concepts here (besides <code>Commands</code>):</p>
+<ol>
+<li><code>With</code>: query entities with a certain component, without retrieving it</li>
+<li><code>ResMut</code>: mutably access a resource</li>
+<li><code>Option&lt;Res&gt;</code>: access a resource that may not be existing</li>
+</ol>
+<p>Note how <code>Option&lt;Res&lt;T&gt;&gt;</code> is semantically different from <code>Res&lt;Option&lt;T&gt;&gt;</code>:</p>
+<ol>
+<li><code>Option&lt;Res&lt;T&gt;&gt;</code> is a resource of type <code>T</code> that may not be stored</li>
+<li><code>Res&lt;Option&lt;T&gt;&gt;</code> is a resource of type <code>&lt;Option&lt;T&gt;&gt;</code> that is assumed to be stored</li>
+</ol>
+<p>if a resource is not stored, the system will panic in the second case, but not the first.</p>
+<p>Querying will be explored more in detail in the next chapters.</p>
 
                     </main>
 
@@ -191,6 +251,20 @@ world.spawn().insert_bundle((
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
