@@ -1,4 +1,4 @@
-# Components and Resources
+# Components, entities and Resources
 
 ## Components
 
@@ -23,6 +23,58 @@ pub struct PointC(pub Point);
 There's something interesting here: `PointC`, which is a tuple struct, unlike the other (regular) structs.
 
 Why so? Because the type `Point` is not defined in our crate, and therefore, can't derive `Component`; in order to work this problem around, we wrap it in our type (`PointC`), and derive the wrapping type.
+
+## Entities
+
+Adding entities to the ECS is trivial both in Legion and Bevy.
+
+The simplest possible form that we can adopt to create an entity (in Bevy lexicon, a "Bundle"), is to insert a tuple:
+
+```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+
+// Note that we generally use systems to manage entities, but in this case, we're strictly following
+// the source project's design.
+//
+pub fn spawn_player(world: &mut World, pos: Point) {
+    world.spawn().insert_bundle((
+        Player,
+        PointC(pos),
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('@'),
+        },
+    ));
+}
+```
+
+The entity inserted above has three components (`Player`, `PointC` and `Render`), which are bundled together as tuple.
+
+We can use a more declarative approach, and use an annotated struct:
+
+```rs
+#[derive(Bundle)]
+struct PlayerBundle {
+  player: Player,
+  pos: PointC,
+  render: Render,
+}
+```
+
+It's crucial, in this case, to annotate the struct with `#[derive(Bundle)]`; if one forgets this, and accidentally uses a bundle as component, no error will be raised!
+
+Bundles can be nested (and again, we need to annotate the children, this time with `#[bundle]`), although in this project, this feature is not used:
+
+```rs
+#[derive(Bundle)]
+struct PlayerBundle {
+  player: Player,
+  pos: PointC,
+
+  #[bundle]
+  sprite: SpriteSheetBundle,
+}
+```
 
 ## Resources
 
