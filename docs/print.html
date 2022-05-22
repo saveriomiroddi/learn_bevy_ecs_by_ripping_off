@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_and_resources.html"><strong aria-hidden="true">4.</strong> Components and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_entities_resources.html"><strong aria-hidden="true">4.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="06_01/system_sets_introduction.html"><strong aria-hidden="true">6.</strong> Introduction to System sets</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -319,7 +319,7 @@ pub fn player_input(
 </ol>
 <p>if a resource is not stored, the system will panic in the second case, but not the first.</p>
 <p>Querying will be explored more in detail in the next chapters.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="components-and-resources"><a class="header" href="#components-and-resources">Components and Resources</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="components-entities-and-resources"><a class="header" href="#components-entities-and-resources">Components, entities and Resources</a></h1>
 <h2 id="components"><a class="header" href="#components">Components</a></h2>
 <p>In Bevy, components must derive <code>Component</code>:</p>
 <pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: component.rs
@@ -338,6 +338,45 @@ pub struct PointC(pub Point);
 </code></pre>
 <p>There's something interesting here: <code>PointC</code>, which is a tuple struct, unlike the other (regular) structs.</p>
 <p>Why so? Because the type <code>Point</code> is not defined in our crate, and therefore, can't derive <code>Component</code>; in order to work this problem around, we wrap it in our type (<code>PointC</code>), and derive the wrapping type.</p>
+<h2 id="entities"><a class="header" href="#entities">Entities</a></h2>
+<p>Adding entities to the ECS is trivial both in Legion and Bevy.</p>
+<p>The simplest possible form that we can adopt to create an entity (in Bevy lexicon, a &quot;Bundle&quot;), is to insert a tuple:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+
+// Note that we generally use systems to manage entities, but in this case, we're strictly following
+// the source project's design.
+//
+pub fn spawn_player(world: &amp;mut World, pos: Point) {
+    world.spawn().insert_bundle((
+        Player,
+        PointC(pos),
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('@'),
+        },
+    ));
+}
+</code></pre>
+<p>The entity inserted above has three components (<code>Player</code>, <code>PointC</code> and <code>Render</code>), which are bundled together as tuple.</p>
+<p>We can use a more declarative approach, and use an annotated struct:</p>
+<pre><code class="language-rs">#[derive(Bundle)]
+struct PlayerBundle {
+  player: Player,
+  pos: PointC,
+  render: Render,
+}
+</code></pre>
+<p>It's crucial, in this case, to annotate the struct with <code>#[derive(Bundle)]</code>; if one forgets this, and accidentally uses a bundle as component, no error will be raised!</p>
+<p>Bundles can be nested (and again, we need to annotate the children, this time with <code>#[bundle]</code>), although in this project, this feature is not used:</p>
+<pre><code class="language-rs">#[derive(Bundle)]
+struct PlayerBundle {
+  player: Player,
+  pos: PointC,
+
+  #[bundle]
+  sprite: SpriteSheetBundle,
+}
+</code></pre>
 <h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
 <p>Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource.</p>
 <pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
@@ -375,7 +414,46 @@ if let Some(key) = ctx.key {
 }
 </code></pre>
 <p>If we forget the <code>remove_resource</code> invocation, if the player doesn't press any key, the current frame will still hold the keypress resource from the previous frame!</p>
-<p>This is not needed when using Bevy input handling; it's only necessary in the context of the port.</p>
+<p>This is not needed when using Bevy input handling (with an exception: see <a href="https://bevy-cheatbook.github.io/programming/states.html#with-input">here</a>); it's only necessary in the context of the port.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="introduction-to-system-sets"><a class="header" href="#introduction-to-system-sets">Introduction to System sets</a></h1>
+<p>One fundamental different between the architectures of the source design (Legion) and the port (Bevy) is how systems are grouped and scheduled.</p>
+<p>In Legion, this is very simple; all the systems that belong to a (conceptual) state, are grouped together into a a &quot;Schedule&quot;, which is sent to Legion, to be run on each update:</p>
+<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: mod.rs
+
+Schedule::builder()
+    .add_system(player_input::player_input_system())
+    .add_system(map_render::map_render_system())
+    .add_system(entity_render::entity_render_system())
+    .build()
+
+// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+
+// `self.systems` is the Schedule instance built above.
+//
+self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
+</code></pre>
+<p>Bevy uses similar semantics as well, however, they are more conceptually more complex; the closest concept in Bevy is the system of <code>Stage</code>s and <code>SystemSet</code>s. In this chapter, we'll explore the <code>SystemSet</code>s.</p>
+<h2 id="warning"><a class="header" href="#warning">Warning</a></h2>
+<p>As of v0.7, Bevy's states are practically unusable, except for trivial programs; this is due to the internal APIs used to implement them (see <a href="https://bevy-cheatbook.github.io/programming/states.html#combining-with-other-run-criteria">here</a>). Trying, for example, to use the standard <code>SystemSet</code>/<code>Stage</code> Bevy APIs for this project, will cause the program to hang.</p>
+<p>Fortunately, there is a third party crate, <a href="https://github.com/IyesGames/iyes_loopless">iyes_loopless</a>, that solves this problem, while also maintaining the semantics identical (or very close) to Bevy's, with a clean interface.</p>
+<p>The rest of this book assumes that the <code>iyes_loopless</code> crate is used:</p>
+<pre><code class="language-toml"># Cargo.toml
+
+[dependencies]
+bevy = &quot;0.7.0&quot;
+iyes_loopless = &quot;0.5.1&quot;
+</code></pre>
+<h2 id="systemsets"><a class="header" href="#systemsets"><code>SystemSet</code>s</a></h2>
+<p>A <code>SystemSet</code> in Bevy, is the abstraction that allows grouping and scheduling the systems, based on user-provided properties.</p>
+<p>At this step, only the grouping functionality is used:</p>
+<pre><code class="language-rs">SystemSet::new()
+    .with_system(player_input::player_input)
+    .with_system(map_render::map_render)
+    .with_system(entity_render::entity_render)
+</code></pre>
+<p>The above is the simplest form that a <code>SystemSet</code> can have: an anonymous group of systems that will run in parallel.</p>
+<p>Don't forget the <em>parallel</em> - by default, Bevy runs the systems in parallel, so consider this when designing the system.</p>
+<p>Another extremely important concept is that changes applied by a system to entities, are <strong>not</strong> seen by systems in the same system set. This doesn't matter now (the renderings are independent of the player entity properties), so we'll get back on this later.</p>
 
                     </main>
 
