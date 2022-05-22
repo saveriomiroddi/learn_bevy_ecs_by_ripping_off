@@ -28,4 +28,4 @@ if let Some(key) = ctx.key {
 
 If we forget the `remove_resource` invocation, if the player doesn't press any key, the current frame will still hold the keypress resource from the previous frame!
 
-This is not needed when using Bevy input handling; it's only necessary in the context of the port.
+This is not needed when using Bevy input handling (with an exception: see [here](https://bevy-cheatbook.github.io/programming/states.html#with-input)); it's only necessary in the context of the port.
