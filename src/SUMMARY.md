@@ -10,3 +10,4 @@
 - [World and systems](./06_01/world_and_systems.md)
 - [Components, entities and resources](./06_01/components_entities_resources.md)
 - [Keyboard input](./06_01/keyboard_input.md)
+- [Introduction to System sets](./06_01/system_sets_introduction.md)
