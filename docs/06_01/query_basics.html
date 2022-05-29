@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>World and systems - Learn Bevy&#x27;s ECS by ripping off someone else&#x27;s project</title>
+        <title>Query basics - Learn Bevy&#x27;s ECS by ripping off someone else&#x27;s project</title>
         <!-- Custom HTML head -->
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-B7KRHPXLYN"></script>
@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html" class="active"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">4.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">6.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">7.</strong> Query basics</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">4.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">6.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html" class="active"><strong aria-hidden="true">7.</strong> Query basics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -143,106 +143,91 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="world-and-systems"><a class="header" href="#world-and-systems">World and systems</a></h1>
-<h2 id="world"><a class="header" href="#world">World</a></h2>
-<p>In Legion, we work directly on <code>World</code> and <code>Resources</code>:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
-
-let mut ecs = World::default();
-let mut resources = Resources::default();
-
-// [...]
-
-self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
-</code></pre>
-<p>In Bevy, the semantics are similar, although the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
-<p>We still can manipulate <code>World</code>, just as long as we're aware that accessing it mutably, prevents systems from running. In the ported project, in order to maintain the structure similar to the source, I've intentionally done it:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
-
-// The world instance is accessible via App#world.
-//
-world.spawn().insert_bundle((
-    Player,
-    PointC(pos),
-    Render {
-        color: ColorPair::new(WHITE, BLACK),
-        glyph: to_cp437('@'),
-    },
-));
-</code></pre>
-<p>Generally speaking, while one can use this approach, in particular in stages where performance is not a concern, using systems should be preferred.</p>
-<h2 id="systems"><a class="header" href="#systems">Systems</a></h2>
-<p>In Legion, systems require attributes, and queries are manually invoked:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
-
-#[system]
-#[read_component(Point)]
-#[read_component(Render)]
-pub fn entity_render(ecs: &amp;SubWorld, #[resource] camera: &amp;Camera) {
-    // ...
-
-    &lt;(&amp;Point, &amp;Render)&gt;::query()
-        .iter(ecs)
-        .for_each(|(pos, render)| {
-            draw_batch.set(*pos - offset, render.color, render.glyph);
-        });
-
-    // ...
-}
-</code></pre>
-<p>In Bevy, systems are simpler; they don't require attributes, and the queries are declared as function parameters:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
-
-pub fn entity_render(query: Query&lt;(&amp;PointC, &amp;Render)&gt;, camera: Res&lt;Camera&gt;) {
-    // ...
-
-    for (pos, render) in query.iter() {
-        draw_batch.set(pos.0 - offset, render.color, render.glyph);
+                        <h1 id="query-basics"><a class="header" href="#query-basics">Query basics</a></h1>
+<p>Queries are a shiny example of Bevy's capabilities. Putting aside performance, any project will certainly benefit from their ergonomy.</p>
+<p>Their distinctive trait is that they're entirely, and automatically, defined by the systems function signature, while allowing at the same time a great amount of flxeibility.</p>
+<h2 id="basic-queries-definition-and-iteration"><a class="header" href="#basic-queries-definition-and-iteration">Basic queries definition and iteration</a></h2>
+<p>This is a basic (edited) example:</p>
+<pre><code class="language-rs">pub fn entity_render(query: Query&lt;(&amp;PointC, Option&lt;&amp;Render&gt;)&gt;) {
+    for (pos: &amp;PointC, render: Option&lt;&amp;Render&gt;) in query.iter() {
+        if let Some(render) = render {
+          // ...
+        }
     }
-
-    // ...
 }
 </code></pre>
-<p>In this example, we perform two accesses:</p>
+<p>Here, we query all the entities that have a <code>PointC</code>, and optionally a <code>Render</code> component, and retrieve both of them in the query.</p>
+<p>Iteration can be mutable or immutable; in order to make the above mutable:</p>
 <ul>
-<li>we query entities, via <code>Query</code> type; in this case, entities with <code>PointC</code> and <code>Render</code> components</li>
-<li>we retrieve a <code>Camera</code> resource, via <code>Res</code> (readonly access) type</li>
+<li>make <code>query</code> mutable: <code>mut Query&lt;(&amp;PointC, Option&lt;&amp;Render&gt;)&gt;</code></li>
+<li>use the mutable iterator API: <code>query.iter_mut()</code></li>
 </ul>
-<p>Another fundamental API component is <code>Commands</code>, which is used primarly to add/remove entities and resources.</p>
-<p>The following example shows other functionalities:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
-
-pub fn player_input(
+<h2 id="resources-and-commands"><a class="header" href="#resources-and-commands">Resources and commands</a></h2>
+<p>In addition to Queries, systems are also typically provided access to commands and resources:</p>
+<pre><code class="language-rs">pub fn player_input(
     mut commands: Commands,
-    mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;,
+    mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;, //(1) (2)
     (map, key, mut camera): (Res&lt;Map&gt;, Option&lt;Res&lt;VirtualKeyCode&gt;&gt;, ResMut&lt;Camera&gt;),
-) {
-  // ...
+)
+</code></pre>
+<p>Commands are used to perform write operations, typically on entities and resources; while the details will be described later, in this context, an example invocation is:</p>
+<pre><code class="language-rs">commands.remove_resource::&lt;VirtualKeyCode&gt;();
+</code></pre>
+<p>which removes a resource from the storage.</p>
+<p>We can observe resources access on the third set of parameters; its definition is intuitive, and the main information we need to know is:</p>
+<ul>
+<li>if a resource may not exist, it must be accessed via <code>Option&lt;Res&lt;T&gt;&gt;</code>;</li>
+<li>immutable/mutable access to a resource are performed via, respectively, the types <code>Res</code>/<code>ResMut</code>.</li>
+</ul>
+<p>Queries resources implement <code>Deref</code>/<code>DerefMut</code>, so we can access them without any syntactic requirement, for example:</p>
+<pre><code class="language-rs">camera.on_player_move(destination);
+</code></pre>
+<p>which is invoking the method:</p>
+<pre><code class="language-rs">impl Camera {
+    pub fn on_player_move(&amp;mut self, player_position: Point) { /* ... */ }
 }
 </code></pre>
-<p>There are a few new concepts here (besides <code>Commands</code>):</p>
-<ol>
-<li><code>With</code>: query entities with a certain component, without retrieving it</li>
-<li><code>ResMut</code>: mutably access a resource</li>
-<li><code>Option&lt;Res&gt;</code>: access a resource that may not be existing</li>
-</ol>
-<p>Note how <code>Option&lt;Res&lt;T&gt;&gt;</code> is semantically different from <code>Res&lt;Option&lt;T&gt;&gt;</code>:</p>
-<ol>
-<li><code>Option&lt;Res&lt;T&gt;&gt;</code> is a resource of type <code>T</code> that may not be stored</li>
-<li><code>Res&lt;Option&lt;T&gt;&gt;</code> is a resource of type <code>&lt;Option&lt;T&gt;&gt;</code> that is assumed to be stored</li>
-</ol>
-<p>if a resource is not stored, the system will panic in the second case, but not the first.</p>
-<p>Querying will be explored more in detail in the next chapters.</p>
+<p>since access to <code>ResMut</code> automatically dereferences to <code>&amp;mut Camera</code>.</p>
+<h2 id="query-conditionals"><a class="header" href="#query-conditionals">Query conditionals</a></h2>
+<p>By using components directly as query parameters, we've made an implicit assumption: that we want to search entities that include all the components specified, and that we want to retrieve all the components.</p>
+<p>A companion concept one may want to express is exclusion: query entities that do <em>not</em> include a component; we use the <code>With</code> trait for this:</p>
+<pre><code class="language-rs">pub fn entity_render(query: Query&lt;&amp;PointC, Without&lt;Invisibility&gt;&gt;) {
+    for pos: &amp;PointC in query.iter() {
+      // ...
+    }
+}
+</code></pre>
+<p>in this case we want all the entities that have a <code>PointC</code> component, but not an <code>Invisibility</code> one.</p>
+<p>There's also something worth mentioning: when querying a single component, we don't use a tuple as <code>Query</code> type parameter <code>Query&lt;(&amp;Player), ...&gt;</code>, but the type alone; this has an effect on the iteration, which is <code>pos: &amp;PointC</code> instead of <code>(pos: &amp;PointC)</code>.</p>
+<p>The port does not make use of the <code>Without</code> conditionals, however, there is a link: the inclusion conditional - <code>With</code>.</p>
+<p>What's the use, if <code>Query</code> implicitly perform inclusion? Convenience, and potentially performance. In some cases, we query for a component, but we don't need to actively use it; by specifying it as <code>With</code> parameter, it's not retrieved; an (edited) example is:</p>
+<pre><code class="language-rs">pub fn player_input(mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;) {
+    if let Ok(pos) = player_query.get_single() {
+        camera.on_player_move(pos);
+    }
+}
+</code></pre>
+<p>In this case we want to know the position of the player, in order to process it, but since we don't process the Player component, we don't retrieve it.</p>
+<p>There's a new API used here: <code>get_single()</code>; it is part of a family of APIs that allow access to a set of components in a query, without iteration:</p>
+<table><thead><tr><th>API</th><th align="center">Checked? (Ret. type)</th><th align="center">Access</th></tr></thead><tbody>
+<tr><td><code>single()</code></td><td align="center">N (<code>T</code>)</td><td align="center">immutable</td></tr>
+<tr><td><code>single_mut()</code></td><td align="center">N (<code>T</code>)</td><td align="center">mutable</td></tr>
+<tr><td><code>get_single()</code></td><td align="center">Y (<code>Result&lt;T&gt;</code>)</td><td align="center">immutable</td></tr>
+<tr><td><code>get_single_mut()</code></td><td align="center">Y (<code>Result&lt;T&gt;</code>)</td><td align="center">mutable</td></tr>
+</tbody></table>
+<p>(note that the return type is simplified)</p>
+<p>The APIs are easy to remember:</p>
+<ul>
+<li>the <code>get_</code> prefix specifies checked access (returns <code>None</code> if an instance is not found, instead of panicking), similarly to <code>HashMap</code>;</li>
+<li>the <code>_mut</code> suffix specifies mutable access.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../06_01/base_structure.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../06_01/system_sets_introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
-                            </a>
-                            <a rel="next" href="../06_01/components_entities_resources.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -250,11 +235,8 @@ pub fn player_input(
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../06_01/base_structure.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../06_01/system_sets_introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
-                    </a>
-                    <a rel="next" href="../06_01/components_entities_resources.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
 
