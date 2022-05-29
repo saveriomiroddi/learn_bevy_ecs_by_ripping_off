@@ -98,4 +98,18 @@ pub fn player_input(mut player_query: Query<&mut PointC, With<Player>>) {
 
 In this case we want to know the position of the player, in order to process it, but since we don't process the Player component, we don't retrieve it.
 
-There's a new API used here: `get_single()`, which will be explained later (although its functionality is intuitive).
+There's a new API used here: `get_single()`; it is part of a family of APIs that allow access to a set of components in a query, without iteration:
+
+| API                | Checked? (Ret. type) |  Access   |
+| ------------------ | :------------------: | :-------: |
+| `single()`         |       N (`T`)        | immutable |
+| `single_mut()`     |       N (`T`)        |  mutable  |
+| `get_single()`     |   Y (`Result<T>`)    | immutable |
+| `get_single_mut()` |   Y (`Result<T>`)    |  mutable  |
+
+(note that the return type is simplified)
+
+The APIs are easy to remember:
+
+- the `get_` prefix specifies checked access (returns `None` if an instance is not found, instead of panicking), similarly to `HashMap`;
+- the `_mut` suffix specifies mutable access.
