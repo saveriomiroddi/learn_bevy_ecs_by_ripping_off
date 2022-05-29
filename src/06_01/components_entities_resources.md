@@ -95,6 +95,6 @@ if let Some(key) = ctx.key {
 
 Since there can be only one resource for a given type, when a resource is inserted, any existing resource with the same type is going to be overwritten.
 
-Note how int the example above, we remove a resource through `World`; while this is acceptable, we should strive to use systems where possible. The technical reason for this usage is that Bevy provides resource insertion via the `App` instance, but not the removal. This makes sense architecturally, since in the initialization of a project, one insert resources rather than removing them.
+Note how in the example above, we remove a resource through `World`; while this is acceptable, we should strive to use systems where possible. The technical reason for this usage is that Bevy provides resource insertion via the `App` instance, but not the removal. This makes sense architecturally, since in the initialization of a project, one insert resources rather than removing them.
 
-In the next chapters, we'll see how to access resources in systems.
+Later, we'll see how to access resources in systems.
