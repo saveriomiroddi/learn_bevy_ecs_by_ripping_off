@@ -25,6 +25,47 @@ Iteration can be mutable or immutable; in order to make the above mutable:
 - make `query` mutable: `mut Query<(&PointC, Option<&Render>)>`
 - use the mutable iterator API: `query.iter_mut()`
 
+## Resources and commands
+
+In addition to Queries, systems are also typically provided access to commands and resources:
+
+```rs
+pub fn player_input(
+    mut commands: Commands,
+    mut player_query: Query<&mut PointC, With<Player>>, //(1) (2)
+    (map, key, mut camera): (Res<Map>, Option<Res<VirtualKeyCode>>, ResMut<Camera>),
+)
+```
+
+Commands are used to perform write operations, typically on entities and resources; while the details will be described later, in this context, an example invocation is:
+
+```rs
+commands.remove_resource::<VirtualKeyCode>();
+```
+
+which removes a resource from the storage.
+
+We can observe resources access on the third set of parameters; its definition is intuitive, and the main information we need to know is:
+
+- if a resource may not exist, it must be accessed via `Option<Res<T>>`;
+- immutable/mutable access to a resource are performed via, respectively, the types `Res`/`ResMut`.
+
+Queries resources implement `Deref`/`DerefMut`, so we can access them without any syntactic requirement, for example:
+
+```rs
+camera.on_player_move(destination);
+```
+
+which is invoking the method:
+
+```rs
+impl Camera {
+    pub fn on_player_move(&mut self, player_position: Point) { /* ... */ }
+}
+```
+
+since access to `ResMut` automatically dereferences to `&mut Camera`.
+
 ## Query conditionals
 
 By using components directly as query parameters, we've made an implicit assumption: that we want to search entities that include all the components specified, and that we want to retrieve all the components.
