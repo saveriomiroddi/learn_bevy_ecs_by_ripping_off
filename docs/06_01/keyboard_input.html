@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">4.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html" class="active"><strong aria-hidden="true">5.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">6.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">7.</strong> Query basics</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Step 06.01 introduction</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html" class="active"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -153,7 +153,7 @@
 </code></pre>
 <p>In this context, we rely on bracket-lib for input handling, so the API above is not used.</p>
 <p>The only thing that needs to be kept in mind is that, in the context of the port, we need to remove the key resource:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+<pre><code class="language-rs">// port: main.rs
 
 // key is a bracket-lib `VirtualKeyCode` type
 //

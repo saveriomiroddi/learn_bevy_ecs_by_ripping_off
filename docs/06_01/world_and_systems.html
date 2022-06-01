@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html" class="active"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">4.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">6.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">7.</strong> Query basics</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Step 06.01 introduction</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html" class="active"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -146,7 +146,7 @@
                         <h1 id="world-and-systems"><a class="header" href="#world-and-systems">World and systems</a></h1>
 <h2 id="world"><a class="header" href="#world">World</a></h2>
 <p>In Legion, we work directly on <code>World</code> and <code>Resources</code>:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+<pre><code class="language-rs">// source: main.rs
 
 let mut ecs = World::default();
 let mut resources = Resources::default();
@@ -157,7 +157,7 @@ self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
 </code></pre>
 <p>In Bevy, the semantics are similar, although the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
 <p>We still can manipulate <code>World</code>, just as long as we're aware that accessing it mutably, prevents systems from running. In the ported project, in order to maintain the structure similar to the source, I've intentionally done it:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+<pre><code class="language-rs">// port: spawner.rs
 
 // The world instance is accessible via App#world.
 //
@@ -173,7 +173,7 @@ world.spawn().insert_bundle((
 <p>Generally speaking, while one can use this approach, in particular in stages where performance is not a concern, using systems should be preferred.</p>
 <h2 id="systems"><a class="header" href="#systems">Systems</a></h2>
 <p>In Legion, systems require attributes, and queries are manually invoked:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+<pre><code class="language-rs">// source: entity_render.rs
 
 #[system]
 #[read_component(Point)]
@@ -191,7 +191,7 @@ pub fn entity_render(ecs: &amp;SubWorld, #[resource] camera: &amp;Camera) {
 }
 </code></pre>
 <p>In Bevy, systems are simpler; they don't require attributes, and the queries are declared as function parameters:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+<pre><code class="language-rs">// port: entity_render.rs
 
 pub fn entity_render(query: Query&lt;(&amp;PointC, &amp;Render)&gt;, camera: Res&lt;Camera&gt;) {
     // ...
@@ -210,7 +210,7 @@ pub fn entity_render(query: Query&lt;(&amp;PointC, &amp;Render)&gt;, camera: Res
 </ul>
 <p>Another fundamental API component is <code>Commands</code>, which is used primarly to add/remove entities and resources.</p>
 <p>The following example shows other functionalities:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+<pre><code class="language-rs">// port: player_input.rs
 
 pub fn player_input(
     mut commands: Commands,
