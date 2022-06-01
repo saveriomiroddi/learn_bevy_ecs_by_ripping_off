@@ -15,7 +15,7 @@ In this context, we rely on bracket-lib for input handling, so the API above is 
 The only thing that needs to be kept in mind is that, in the context of the port, we need to remove the key resource:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+// port: main.rs
 
 // key is a bracket-lib `VirtualKeyCode` type
 //

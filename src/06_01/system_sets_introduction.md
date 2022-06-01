@@ -5,7 +5,7 @@ One fundamental different between the architectures of the source design (Legion
 In Legion, this is very simple; all the systems that belong to a (conceptual) state, are grouped together into a a "Schedule", which is sent to Legion, to be run on each update:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: mod.rs
+// source: mod.rs
 
 Schedule::builder()
     .add_system(player_input::player_input_system())
@@ -13,7 +13,7 @@ Schedule::builder()
     .add_system(entity_render::entity_render_system())
     .build()
 
-// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+// source: main.rs
 
 // `self.systems` is the Schedule instance built above.
 //
@@ -45,14 +45,28 @@ A `SystemSet` in Bevy, is the abstraction that allows grouping and scheduling th
 At this step, only the grouping functionality is used:
 
 ```rs
-SystemSet::new()
-    .with_system(player_input::player_input)
-    .with_system(map_render::map_render)
-    .with_system(entity_render::entity_render)
+// port: mod.rs
+
+pub fn build_system_set() -> SystemSet {
+    SystemSet::new()
+        .with_system(player_input::player_input)
+        .with_system(map_render::map_render)
+        .with_system(entity_render::entity_render)
+}
 ```
 
-The above is the simplest form that a `SystemSet` can have: an anonymous group of systems that will run in parallel.
+The above is the simplest form that a system set can have: an anonymous group of systems that will run in parallel.
 
 Don't forget the *parallel* - by default, Bevy runs the systems in parallel, so consider this when designing the system.
 
 Another extremely important concept is that changes applied by a system to entities, are **not** seen by systems in the same system set. This doesn't matter now (the renderings are independent of the player entity properties), so we'll get back on this later.
+
+In the most basic form, system sets are registered with Bevy directly on the `App` instance:
+
+```rs
+// port: main.rs
+
+ecs.add_system_set(build_system_set());
+```
+
+Bevy provides APIs to organize system sets when more are added; at this stage, since there's only one, we register it directly without setting any property.

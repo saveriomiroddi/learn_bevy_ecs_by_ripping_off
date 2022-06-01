@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_entities_resources.html"><strong aria-hidden="true">4.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="06_01/system_sets_introduction.html"><strong aria-hidden="true">6.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="06_01/query_basics.html"><strong aria-hidden="true">7.</strong> Query basics</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/introduction.html"><strong aria-hidden="true">2.</strong> Step 06.01 introduction</a></li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -153,8 +153,8 @@
 <li><a href="https://github.com/64kramsystem/rust-game-ports/tree/master/rusty_roguelike-bevy">port project</a></li>
 <li><a href="https://github.com/64kramsystem/rust-game-ports/tree/master/source_projects/rusty_roguelike">source project</a></li>
 </ul>
-<p>The steps have been numbered (and have matching names in the source/port), in order to facilitate sequential examination and comparison.</p>
-<p>This book presents multiple chapters for each step, explaining the concepts involved. When reading a chapter, one can compare the source step with the ported one, and/or with the previous step in the respective project.</p>
+<p>The steps have been numbered (and have matching names in the source/port), in order to facilitate sequential examination and comparison; each step is an independent workspace.</p>
+<p>This book presents multiple chapters for each step, explaining the concepts involved. When reading a chapter, one can compare the source step (workspace) with the ported one, and/or with the previous step in the respective project.</p>
 <p>The starting chapter is 06.01, where an ECS is introduced in the design.</p>
 <p>It's technically possible to read this book standalone, without the source one, but for newcomers to ECS, it's not advised, as in this context I'm not explaining the ECS concepts (only their Bevy API implementation).</p>
 <h2 id="references"><a class="header" href="#references">References</a></h2>
@@ -163,6 +163,9 @@
 <p>Since comparison is a foundation of this book, I've maintained high and low-level structures as similar as I could; the most radical divergence is due to Bevy's state management. There are still a few differences, but they're minor.</p>
 <h2 id="thanks"><a class="header" href="#thanks">Thanks</a></h2>
 <p>This project has been kindly sponsored by <a href="https://www.ticketsolve.com">Ticketsolve</a>; naturally, it wouldn't have been possible without the great work of <a href="https://twitter.com/herberticus">Herbert Wolverson</a>, and the <a href="https://bevyengine.org">Bevy</a> community.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="step-0601-introduction"><a class="header" href="#step-0601-introduction">Step 06.01 introduction</a></h1>
+<p>In this chapter, the basic elements of the ECS system are introduced.</p>
+<p>The directory name is <code>06_EntitiesComponentsAndSystems_01_playerecs</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="base-structure"><a class="header" href="#base-structure">Base structure</a></h1>
 <p>The very first step in the port is plugging Bevy's ECS. The source project has a mixed, game engine-wise, design:</p>
 <ul>
@@ -170,7 +173,7 @@
 <li>for each cycle (frame), an update is invoked on the ECS (<a href="https://github.com/amethyst/legion">Legion</a>).</li>
 </ul>
 <p>This is bare-bones structure of the source project:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+<pre><code class="language-rs">// source: main.rs
 
 struct State {
     ecs: World,
@@ -208,7 +211,7 @@ fn main() -&gt; BError {
 <li>Legion's systems update for each tick maps to the <a href="https://github.com/bevyengine/bevy/blob/83c6ffb73c4a91182cda10141f824987ef3fba2f/crates/bevy_app/src/app.rs#L111"><code>App#update()</code> API</a>.</li>
 </ul>
 <p>leading to:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+<pre><code class="language-rs">// port: main.rs
 
 struct State {
     ecs: App,
@@ -232,7 +235,7 @@ impl GameState for State {
 <div style="break-before: page; page-break-before: always;"></div><h1 id="world-and-systems"><a class="header" href="#world-and-systems">World and systems</a></h1>
 <h2 id="world"><a class="header" href="#world">World</a></h2>
 <p>In Legion, we work directly on <code>World</code> and <code>Resources</code>:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+<pre><code class="language-rs">// source: main.rs
 
 let mut ecs = World::default();
 let mut resources = Resources::default();
@@ -243,7 +246,7 @@ self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
 </code></pre>
 <p>In Bevy, the semantics are similar, although the idea is to use systems without interacting with the underlying data structures; this is because the engine manages them, and accessing them directly limits the (parallel) scheduling.</p>
 <p>We still can manipulate <code>World</code>, just as long as we're aware that accessing it mutably, prevents systems from running. In the ported project, in order to maintain the structure similar to the source, I've intentionally done it:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+<pre><code class="language-rs">// port: spawner.rs
 
 // The world instance is accessible via App#world.
 //
@@ -259,7 +262,7 @@ world.spawn().insert_bundle((
 <p>Generally speaking, while one can use this approach, in particular in stages where performance is not a concern, using systems should be preferred.</p>
 <h2 id="systems"><a class="header" href="#systems">Systems</a></h2>
 <p>In Legion, systems require attributes, and queries are manually invoked:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+<pre><code class="language-rs">// source: entity_render.rs
 
 #[system]
 #[read_component(Point)]
@@ -277,7 +280,7 @@ pub fn entity_render(ecs: &amp;SubWorld, #[resource] camera: &amp;Camera) {
 }
 </code></pre>
 <p>In Bevy, systems are simpler; they don't require attributes, and the queries are declared as function parameters:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+<pre><code class="language-rs">// port: entity_render.rs
 
 pub fn entity_render(query: Query&lt;(&amp;PointC, &amp;Render)&gt;, camera: Res&lt;Camera&gt;) {
     // ...
@@ -296,7 +299,7 @@ pub fn entity_render(query: Query&lt;(&amp;PointC, &amp;Render)&gt;, camera: Res
 </ul>
 <p>Another fundamental API component is <code>Commands</code>, which is used primarly to add/remove entities and resources.</p>
 <p>The following example shows other functionalities:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+<pre><code class="language-rs">// port: player_input.rs
 
 pub fn player_input(
     mut commands: Commands,
@@ -322,7 +325,7 @@ pub fn player_input(
 <div style="break-before: page; page-break-before: always;"></div><h1 id="components-entities-and-resources"><a class="header" href="#components-entities-and-resources">Components, entities and Resources</a></h1>
 <h2 id="components"><a class="header" href="#components">Components</a></h2>
 <p>In Bevy, components must derive <code>Component</code>:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: component.rs
+<pre><code class="language-rs">// port: component.rs
 
 #[derive(Component)]
 pub struct Render {
@@ -341,7 +344,7 @@ pub struct PointC(pub Point);
 <h2 id="entities"><a class="header" href="#entities">Entities</a></h2>
 <p>Adding entities to the ECS is trivial both in Legion and Bevy.</p>
 <p>The simplest possible form that we can adopt to create an entity (in Bevy lexicon, a &quot;Bundle&quot;), is to insert a tuple:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+<pre><code class="language-rs">// port: spawner.rs
 
 // Note that we generally use systems to manage entities, but in this case, we're strictly following
 // the source project's design.
@@ -379,7 +382,7 @@ struct PlayerBundle {
 </code></pre>
 <h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
 <p>Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource.</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+<pre><code class="language-rs">// port: main.rs
 
 // key is a bracket-lib `VirtualKeyCode` type
 // ecs is the Bevy `App` instance
@@ -403,7 +406,7 @@ if let Some(key) = ctx.key {
 </code></pre>
 <p>In this context, we rely on bracket-lib for input handling, so the API above is not used.</p>
 <p>The only thing that needs to be kept in mind is that, in the context of the port, we need to remove the key resource:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+<pre><code class="language-rs">// port: main.rs
 
 // key is a bracket-lib `VirtualKeyCode` type
 //
@@ -418,7 +421,7 @@ if let Some(key) = ctx.key {
 <div style="break-before: page; page-break-before: always;"></div><h1 id="introduction-to-system-sets"><a class="header" href="#introduction-to-system-sets">Introduction to System sets</a></h1>
 <p>One fundamental different between the architectures of the source design (Legion) and the port (Bevy) is how systems are grouped and scheduled.</p>
 <p>In Legion, this is very simple; all the systems that belong to a (conceptual) state, are grouped together into a a &quot;Schedule&quot;, which is sent to Legion, to be run on each update:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: mod.rs
+<pre><code class="language-rs">// source: mod.rs
 
 Schedule::builder()
     .add_system(player_input::player_input_system())
@@ -426,7 +429,7 @@ Schedule::builder()
     .add_system(entity_render::entity_render_system())
     .build()
 
-// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+// source: main.rs
 
 // `self.systems` is the Schedule instance built above.
 //
@@ -446,20 +449,32 @@ iyes_loopless = &quot;0.5.1&quot;
 <h2 id="systemsets"><a class="header" href="#systemsets"><code>SystemSet</code>s</a></h2>
 <p>A <code>SystemSet</code> in Bevy, is the abstraction that allows grouping and scheduling the systems, based on user-provided properties.</p>
 <p>At this step, only the grouping functionality is used:</p>
-<pre><code class="language-rs">SystemSet::new()
-    .with_system(player_input::player_input)
-    .with_system(map_render::map_render)
-    .with_system(entity_render::entity_render)
+<pre><code class="language-rs">// port: mod.rs
+
+pub fn build_system_set() -&gt; SystemSet {
+    SystemSet::new()
+        .with_system(player_input::player_input)
+        .with_system(map_render::map_render)
+        .with_system(entity_render::entity_render)
+}
 </code></pre>
-<p>The above is the simplest form that a <code>SystemSet</code> can have: an anonymous group of systems that will run in parallel.</p>
+<p>The above is the simplest form that a system set can have: an anonymous group of systems that will run in parallel.</p>
 <p>Don't forget the <em>parallel</em> - by default, Bevy runs the systems in parallel, so consider this when designing the system.</p>
 <p>Another extremely important concept is that changes applied by a system to entities, are <strong>not</strong> seen by systems in the same system set. This doesn't matter now (the renderings are independent of the player entity properties), so we'll get back on this later.</p>
+<p>In the most basic form, system sets are registered with Bevy directly on the <code>App</code> instance:</p>
+<pre><code class="language-rs">// port: main.rs
+
+ecs.add_system_set(build_system_set());
+</code></pre>
+<p>Bevy provides APIs to organize system sets when more are added; at this stage, since there's only one, we register it directly without setting any property.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="query-basics"><a class="header" href="#query-basics">Query basics</a></h1>
 <p>Queries are a shiny example of Bevy's capabilities. Putting aside performance, any project will certainly benefit from their ergonomy.</p>
 <p>Their distinctive trait is that they're entirely, and automatically, defined by the systems function signature, while allowing at the same time a great amount of flxeibility.</p>
 <h2 id="basic-queries-definition-and-iteration"><a class="header" href="#basic-queries-definition-and-iteration">Basic queries definition and iteration</a></h2>
 <p>This is a basic (edited) example:</p>
-<pre><code class="language-rs">pub fn entity_render(query: Query&lt;(&amp;PointC, Option&lt;&amp;Render&gt;)&gt;) {
+<pre><code class="language-rs">// port: entity_render.rs
+
+pub fn entity_render(query: Query&lt;(&amp;PointC, Option&lt;&amp;Render&gt;)&gt;) {
     for (pos: &amp;PointC, render: Option&lt;&amp;Render&gt;) in query.iter() {
         if let Some(render) = render {
           // ...
@@ -475,14 +490,18 @@ iyes_loopless = &quot;0.5.1&quot;
 </ul>
 <h2 id="resources-and-commands"><a class="header" href="#resources-and-commands">Resources and commands</a></h2>
 <p>In addition to Queries, systems are also typically provided access to commands and resources:</p>
-<pre><code class="language-rs">pub fn player_input(
+<pre><code class="language-rs">// port: player_input.rs
+
+pub fn player_input(
     mut commands: Commands,
     mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;, //(1) (2)
     (map, key, mut camera): (Res&lt;Map&gt;, Option&lt;Res&lt;VirtualKeyCode&gt;&gt;, ResMut&lt;Camera&gt;),
 )
 </code></pre>
 <p>Commands are used to perform write operations, typically on entities and resources; while the details will be described later, in this context, an example invocation is:</p>
-<pre><code class="language-rs">commands.remove_resource::&lt;VirtualKeyCode&gt;();
+<pre><code class="language-rs">// port: player_input.rs
+
+commands.remove_resource::&lt;VirtualKeyCode&gt;();
 </code></pre>
 <p>which removes a resource from the storage.</p>
 <p>We can observe resources access on the third set of parameters; its definition is intuitive, and the main information we need to know is:</p>
@@ -491,10 +510,14 @@ iyes_loopless = &quot;0.5.1&quot;
 <li>immutable/mutable access to a resource are performed via, respectively, the types <code>Res</code>/<code>ResMut</code>.</li>
 </ul>
 <p>Queries resources implement <code>Deref</code>/<code>DerefMut</code>, so we can access them without any syntactic requirement, for example:</p>
-<pre><code class="language-rs">camera.on_player_move(destination);
+<pre><code class="language-rs">// port: player_input.rs
+
+camera.on_player_move(destination);
 </code></pre>
 <p>which is invoking the method:</p>
-<pre><code class="language-rs">impl Camera {
+<pre><code class="language-rs">// port: camera.rs
+
+impl Camera {
     pub fn on_player_move(&amp;mut self, player_position: Point) { /* ... */ }
 }
 </code></pre>
@@ -502,7 +525,9 @@ iyes_loopless = &quot;0.5.1&quot;
 <h2 id="query-conditionals"><a class="header" href="#query-conditionals">Query conditionals</a></h2>
 <p>By using components directly as query parameters, we've made an implicit assumption: that we want to search entities that include all the components specified, and that we want to retrieve all the components.</p>
 <p>A companion concept one may want to express is exclusion: query entities that do <em>not</em> include a component; we use the <code>With</code> trait for this:</p>
-<pre><code class="language-rs">pub fn entity_render(query: Query&lt;&amp;PointC, Without&lt;Invisibility&gt;&gt;) {
+<pre><code class="language-rs">// port: entity_render.rs
+
+pub fn entity_render(query: Query&lt;&amp;PointC, Without&lt;Invisibility&gt;&gt;) {
     for pos: &amp;PointC in query.iter() {
       // ...
     }
@@ -512,7 +537,9 @@ iyes_loopless = &quot;0.5.1&quot;
 <p>There's also something worth mentioning: when querying a single component, we don't use a tuple as <code>Query</code> type parameter <code>Query&lt;(&amp;Player), ...&gt;</code>, but the type alone; this has an effect on the iteration, which is <code>pos: &amp;PointC</code> instead of <code>(pos: &amp;PointC)</code>.</p>
 <p>The port does not make use of the <code>Without</code> conditionals, however, there is a link: the inclusion conditional - <code>With</code>.</p>
 <p>What's the use, if <code>Query</code> implicitly perform inclusion? Convenience, and potentially performance. In some cases, we query for a component, but we don't need to actively use it; by specifying it as <code>With</code> parameter, it's not retrieved; an (edited) example is:</p>
-<pre><code class="language-rs">pub fn player_input(mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;) {
+<pre><code class="language-rs">// port: player_input.rs
+
+pub fn player_input(mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&gt;&gt;) {
     if let Ok(pos) = player_query.get_single() {
         camera.on_player_move(pos);
     }

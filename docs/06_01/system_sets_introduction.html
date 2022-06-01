@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">2.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">3.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">4.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">5.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html" class="active"><strong aria-hidden="true">6.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">7.</strong> Query basics</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Step 06.01 introduction</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html" class="active"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -146,7 +146,7 @@
                         <h1 id="introduction-to-system-sets"><a class="header" href="#introduction-to-system-sets">Introduction to System sets</a></h1>
 <p>One fundamental different between the architectures of the source design (Legion) and the port (Bevy) is how systems are grouped and scheduled.</p>
 <p>In Legion, this is very simple; all the systems that belong to a (conceptual) state, are grouped together into a a &quot;Schedule&quot;, which is sent to Legion, to be run on each update:</p>
-<pre><code class="language-rs">// 06_EntitiesComponentsAndSystems_01_playerecs: mod.rs
+<pre><code class="language-rs">// source: mod.rs
 
 Schedule::builder()
     .add_system(player_input::player_input_system())
@@ -154,7 +154,7 @@ Schedule::builder()
     .add_system(entity_render::entity_render_system())
     .build()
 
-// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+// source: main.rs
 
 // `self.systems` is the Schedule instance built above.
 //
@@ -174,14 +174,24 @@ iyes_loopless = &quot;0.5.1&quot;
 <h2 id="systemsets"><a class="header" href="#systemsets"><code>SystemSet</code>s</a></h2>
 <p>A <code>SystemSet</code> in Bevy, is the abstraction that allows grouping and scheduling the systems, based on user-provided properties.</p>
 <p>At this step, only the grouping functionality is used:</p>
-<pre><code class="language-rs">SystemSet::new()
-    .with_system(player_input::player_input)
-    .with_system(map_render::map_render)
-    .with_system(entity_render::entity_render)
+<pre><code class="language-rs">// port: mod.rs
+
+pub fn build_system_set() -&gt; SystemSet {
+    SystemSet::new()
+        .with_system(player_input::player_input)
+        .with_system(map_render::map_render)
+        .with_system(entity_render::entity_render)
+}
 </code></pre>
-<p>The above is the simplest form that a <code>SystemSet</code> can have: an anonymous group of systems that will run in parallel.</p>
+<p>The above is the simplest form that a system set can have: an anonymous group of systems that will run in parallel.</p>
 <p>Don't forget the <em>parallel</em> - by default, Bevy runs the systems in parallel, so consider this when designing the system.</p>
 <p>Another extremely important concept is that changes applied by a system to entities, are <strong>not</strong> seen by systems in the same system set. This doesn't matter now (the renderings are independent of the player entity properties), so we'll get back on this later.</p>
+<p>In the most basic form, system sets are registered with Bevy directly on the <code>App</code> instance:</p>
+<pre><code class="language-rs">// port: main.rs
+
+ecs.add_system_set(build_system_set());
+</code></pre>
+<p>Bevy provides APIs to organize system sets when more are added; at this stage, since there's only one, we register it directly without setting any property.</p>
 
                     </main>
 
