@@ -9,6 +9,8 @@ Their distinctive trait is that they're entirely, and automatically, defined by 
 This is a basic (edited) example:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+
 pub fn entity_render(query: Query<(&PointC, Option<&Render>)>) {
     for (pos: &PointC, render: Option<&Render>) in query.iter() {
         if let Some(render) = render {
@@ -30,6 +32,8 @@ Iteration can be mutable or immutable; in order to make the above mutable:
 In addition to Queries, systems are also typically provided access to commands and resources:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+
 pub fn player_input(
     mut commands: Commands,
     mut player_query: Query<&mut PointC, With<Player>>, //(1) (2)
@@ -40,6 +44,8 @@ pub fn player_input(
 Commands are used to perform write operations, typically on entities and resources; while the details will be described later, in this context, an example invocation is:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+
 commands.remove_resource::<VirtualKeyCode>();
 ```
 
@@ -53,12 +59,16 @@ We can observe resources access on the third set of parameters; its definition i
 Queries resources implement `Deref`/`DerefMut`, so we can access them without any syntactic requirement, for example:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+
 camera.on_player_move(destination);
 ```
 
 which is invoking the method:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: camera.rs
+
 impl Camera {
     pub fn on_player_move(&mut self, player_position: Point) { /* ... */ }
 }
@@ -73,6 +83,8 @@ By using components directly as query parameters, we've made an implicit assumpt
 A companion concept one may want to express is exclusion: query entities that do _not_ include a component; we use the `With` trait for this:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+
 pub fn entity_render(query: Query<&PointC, Without<Invisibility>>) {
     for pos: &PointC in query.iter() {
       // ...
@@ -89,6 +101,8 @@ The port does not make use of the `Without` conditionals, however, there is a li
 What's the use, if `Query` implicitly perform inclusion? Convenience, and potentially performance. In some cases, we query for a component, but we don't need to actively use it; by specifying it as `With` parameter, it's not retrieved; an (edited) example is:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+
 pub fn player_input(mut player_query: Query<&mut PointC, With<Player>>) {
     if let Ok(pos) = player_query.get_single() {
         camera.on_player_move(pos);

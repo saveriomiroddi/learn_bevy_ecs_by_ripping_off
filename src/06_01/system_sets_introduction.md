@@ -45,6 +45,8 @@ A `SystemSet` in Bevy, is the abstraction that allows grouping and scheduling th
 At this step, only the grouping functionality is used:
 
 ```rs
+// 06_EntitiesComponentsAndSystems_01_playerecs: mod.rs
+
 SystemSet::new()
     .with_system(player_input::player_input)
     .with_system(map_render::map_render)
