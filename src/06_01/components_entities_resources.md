@@ -5,7 +5,7 @@
 In Bevy, components must derive `Component`:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: component.rs
+// port: component.rs
 
 #[derive(Component)]
 pub struct Render {
@@ -31,7 +31,7 @@ Adding entities to the ECS is trivial both in Legion and Bevy.
 The simplest possible form that we can adopt to create an entity (in Bevy lexicon, a "Bundle"), is to insert a tuple:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+// port: spawner.rs
 
 // Note that we generally use systems to manage entities, but in this case, we're strictly following
 // the source project's design.
@@ -81,7 +81,7 @@ struct PlayerBundle {
 Resources, differently from components, currently (this may change in the future!) don't need to be derived; anything inserted in Bevy's ECS is a resource.
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+// port: main.rs
 
 // key is a bracket-lib `VirtualKeyCode` type
 // ecs is the Bevy `App` instance

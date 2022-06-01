@@ -5,7 +5,7 @@
 In Legion, we work directly on `World` and `Resources`:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: main.rs
+// source: main.rs
 
 let mut ecs = World::default();
 let mut resources = Resources::default();
@@ -20,7 +20,7 @@ In Bevy, the semantics are similar, although the idea is to use systems without 
 We still can manipulate `World`, just as long as we're aware that accessing it mutably, prevents systems from running. In the ported project, in order to maintain the structure similar to the source, I've intentionally done it:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: spawner.rs
+// port: spawner.rs
 
 // The world instance is accessible via App#world.
 //
@@ -41,7 +41,7 @@ Generally speaking, while one can use this approach, in particular in stages whe
 In Legion, systems require attributes, and queries are manually invoked:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+// source: entity_render.rs
 
 #[system]
 #[read_component(Point)]
@@ -62,7 +62,7 @@ pub fn entity_render(ecs: &SubWorld, #[resource] camera: &Camera) {
 In Bevy, systems are simpler; they don't require attributes, and the queries are declared as function parameters:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: entity_render.rs
+// port: entity_render.rs
 
 pub fn entity_render(query: Query<(&PointC, &Render)>, camera: Res<Camera>) {
     // ...
@@ -85,7 +85,7 @@ Another fundamental API component is `Commands`, which is used primarly to add/r
 The following example shows other functionalities:
 
 ```rs
-// 06_EntitiesComponentsAndSystems_01_playerecs: player_input.rs
+// port: player_input.rs
 
 pub fn player_input(
     mut commands: Commands,
