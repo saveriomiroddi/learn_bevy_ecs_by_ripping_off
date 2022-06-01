@@ -53,7 +53,7 @@ SystemSet::new()
     .with_system(entity_render::entity_render)
 ```
 
-The above is the simplest form that a `SystemSet` can have: an anonymous group of systems that will run in parallel.
+The above is the simplest form that a system set can have: an anonymous group of systems that will run in parallel.
 
 Don't forget the *parallel* - by default, Bevy runs the systems in parallel, so consider this when designing the system.
 

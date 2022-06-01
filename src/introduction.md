@@ -11,9 +11,9 @@ In the [Rust ports repository](https://github.com/64kramsystem/rust-game-ports),
 - [port project](https://github.com/64kramsystem/rust-game-ports/tree/master/rusty_roguelike-bevy)
 - [source project](https://github.com/64kramsystem/rust-game-ports/tree/master/source_projects/rusty_roguelike)
 
-The steps have been numbered (and have matching names in the source/port), in order to facilitate sequential examination and comparison.
+The steps have been numbered (and have matching names in the source/port), in order to facilitate sequential examination and comparison; each step is an independent workspace.
 
-This book presents multiple chapters for each step, explaining the concepts involved. When reading a chapter, one can compare the source step with the ported one, and/or with the previous step in the respective project.
+This book presents multiple chapters for each step, explaining the concepts involved. When reading a chapter, one can compare the source step (workspace) with the ported one, and/or with the previous step in the respective project.
 
 The starting chapter is 06.01, where an ECS is introduced in the design.
 
