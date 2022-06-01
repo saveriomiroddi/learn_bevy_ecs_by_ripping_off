@@ -1,4 +1,4 @@
-# Step 06.01 introduction
+# Introduction to step 06.01
 
 In this chapter, the basic elements of the ECS system are introduced.
 
