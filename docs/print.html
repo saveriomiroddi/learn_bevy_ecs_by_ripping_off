@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -559,6 +559,101 @@ pub fn player_input(mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&g
 <li>the <code>get_</code> prefix specifies checked access (returns <code>None</code> if an instance is not found, instead of panicking), similarly to <code>HashMap</code>;</li>
 <li>the <code>_mut</code> suffix specifies mutable access.</li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="introduction-to-step-0602"><a class="header" href="#introduction-to-step-0602">Introduction to step 06.02</a></h1>
+<p>In this chapter, we're going to explore some other <code>Query</code>ing concepts.</p>
+<p>The directory name is <code>06_EntitiesComponentsAndSystems_02_dungeonecs</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="querying-entities-and-param-sets"><a class="header" href="#querying-entities-and-param-sets">Querying: Entities and Param sets</a></h1>
+<h2 id="querying-entities"><a class="header" href="#querying-entities">Querying entities</a></h2>
+<p>In the previous chapter about queries, we've queried, and acted upon, only components. How about we need to act entities?</p>
+<p>Both Legion and Bevy use a very similar interface - simply, by adding <code>Entity</code> to the query interface.</p>
+<p>This is a query example:</p>
+<pre><code class="language-rs">// port: collisions.rs (edited)
+
+pub fn collisions(
+    mut commands: Commands,
+    enemies_query: Query&lt;(Entity, &amp;PointC), With&lt;Enemy&gt;&gt;,
+) {
+    for (entity, pos) in enemies_query.iter() {
+        // ... act on the entity ...
+    }
+}
+</code></pre>
+<p>The type <code>Entity</code> is a classic example of handle; it's a lightweight type that supports common operations (copy, comparison, hash...), and therefore, can be conveniently passed around.</p>
+<p>Expanding the example above, we can observe how we actually use it:</p>
+<pre><code class="language-rs">// port: collisions.rs
+
+pub fn collisions(
+    mut commands: Commands,
+    player_query: Query&lt;&amp;PointC, With&lt;Player&gt;&gt;,
+    enemies_query: Query&lt;(Entity, &amp;PointC), With&lt;Enemy&gt;&gt;,
+) {
+    let player_pos = player_query.single().0;
+
+    for (entity, pos) in enemies_query.iter() {
+        if pos.0 == player_pos {
+            commands.entity(entity).despawn()
+        }
+    }
+}
+</code></pre>
+<p>specifically, we pass it to the entity despawning API, when certain component conditions are met (enemy <code>pos</code> matching the player <code>pos</code>).</p>
+<p>Watch out! As we'll see later, despawning doesn't have an immediate effect.</p>
+<h2 id="param-sets"><a class="header" href="#param-sets">Param sets</a></h2>
+<p>Param sets are a functionality that is not needed in the port, but it's important to know nonetheless.</p>
+<p>Let's say, for the sake of example, that we have the following system:</p>
+<pre><code class="language-rs">// port: collisions.rs (edited)
+
+pub fn collisions(
+    player_query: Query&lt;&amp;PointC, With&lt;Player&gt;&gt;,
+    mut enemies_query: Query&lt;&amp;mut PointC, With&lt;Enemy&gt;&gt;,
+) {
+    let player_pos = player_query.single().0;
+
+    for mut pos in enemies_query.iter_mut() {
+        if pos.0 == player_pos {
+            pos.0.x = 0;
+            pos.0.y = 0;
+        }
+    }
+}
+</code></pre>
+<p>which model a logic where instead of despawning the enemy entities, we move them away (by changing pos).</p>
+<p>The project compiles! But, surprise surprise... once when running, we get a crash:</p>
+<pre><code>thread 'main' panicked at 'error[B0001]: Query&lt;(Entity, &amp;mut PointC), With&lt;Enemy&gt;&gt;
+in system collisions accesses component(s) PointC in a way that conflicts with a
+previous system parameter. Consider using `Without&lt;T&gt;` to create disjoint Queries
+or merging conflicting Queries into a `ParamSet`.', /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_ecs-0.7.0/src/system/system_param.rs:173:5
+stack backtrace:
+   0: rust_begin_unwind
+             at /rustc/4cbaac699c14b7ac7cc80e54823b2ef6afeb64af/library/std/src/panicking.rs:584:5
+   1: core::panicking::panic_fmt
+             at /rustc/4cbaac699c14b7ac7cc80e54823b2ef6afeb64af/library/core/src/panicking.rs:142:14
+   2: bevy_ecs::system::system_param::assert_component_access_compatibility
+             at /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_ecs-0.7.0/src/system/system_param.rs:173:5
+   3: &lt;bevy_ecs::query::state::QueryState&lt;Q,F&gt; as bevy_ecs::system::system_param::SystemParamState&gt;::init
+             at /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_ecs-0.7.0/src/system/system_param.rs:113:9
+   4: &lt;(P0,P1,P2) as bevy_ecs::system::system_param::SystemParamState&gt;::init
+             at /home/user/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_ecs-0.7.0/src/system/system_param.rs:1247:21
+</code></pre>
+<p>This is interesting; we're prevented from query <code>PointC</code> in two queries, with incompatible access mode. Bevy doesn't enforce incompatible access compile-time, but it does enforce it runtime.</p>
+<p>In order to solve this problem, one of the two solutions referenced is to use <code>ParamSet</code>:</p>
+<pre><code class="language-rs">pub fn collisions(
+    mut queries: ParamSet&lt;(
+        Query&lt;&amp;PointC, With&lt;Player&gt;&gt;,
+        Query&lt;&amp;mut PointC, With&lt;Enemy&gt;&gt;,
+    )&gt;,
+) {
+    let player_pos = queries.p0().single().0;
+
+    for mut pos in queries.p1().iter_mut() {
+        if pos.0 == player_pos {
+            pos.0.x = 0;
+            pos.0.y = 0;
+        }
+    }
+}
+</code></pre>
+<p>There's no significant difference; we just group the queries inside a <code>ParamSet</code>, and access them via <code>pN()</code> functions. Considering the constraint, this is impressively ergonomic!</p>
 
                     </main>
 
