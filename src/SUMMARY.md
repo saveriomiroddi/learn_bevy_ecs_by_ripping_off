@@ -17,3 +17,4 @@
 # 06.02: Entities, Components and Systems: Dungeon ECS
 
 - [Introduction to step 06.02](./06_02/introduction.md)
+- [Querying: Entities and Param sets](./06_02/querying_entities_and_param_sets.md)
