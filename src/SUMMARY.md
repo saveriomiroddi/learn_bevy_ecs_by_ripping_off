@@ -22,3 +22,4 @@
 # 07.01-02: Turn-based Games: Wandering/Turn-based
 
 - [Introduction to steps 07.01-02](./07_01-02/introduction.md)
+- [A look at the states model in the source project](./07_01-02/a_look_at_the_states_model_in_the_source_project.md)
