@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li><li class="chapter-item expanded affix "><li class="part-title">07.01-02: Turn-based Games: Wandering/Turn-based</li><li class="chapter-item expanded "><a href="07_01-02/introduction.html"><strong aria-hidden="true">11.</strong> Introduction to steps 07.01-02</a></li><li class="chapter-item expanded "><a href="07_01-02/a_look_at_the_states_model_in_the_source_project.html"><strong aria-hidden="true">12.</strong> A look at the states model in the source project</a></li><li class="chapter-item expanded "><a href="07_01-02/a_basic_states_model_in_bevy.html"><strong aria-hidden="true">13.</strong> A basic states model in Bevy</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -654,6 +654,60 @@ stack backtrace:
 }
 </code></pre>
 <p>There's no significant difference; we just group the queries inside a <code>ParamSet</code>, and access them via <code>pN()</code> functions. Considering the constraint, this is impressively ergonomic!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="introduction-to-steps-0701-02"><a class="header" href="#introduction-to-steps-0701-02">Introduction to steps 07.01-02</a></h1>
+<p>This chapter covers both steps 07.01 and 07.02; we're going to explore <code>State</code>s, <code>SystemSet</code>s and <code>Stage</code>s (and the <code>iyes_loopless</code> crate).</p>
+<p>The Bevy concepts described here are the foundation for structuring games, and this step is the one that departs the most from the source project.</p>
+<p>The directory names are <code>07_TurnBasedGames_01_wandering</code> and <code>07_TurnBasedGames_02_turnbased</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="a-look-at-the-states-model-in-the-source-project"><a class="header" href="#a-look-at-the-states-model-in-the-source-project">A look at the states model in the source project</a></h1>
+<p>Before getting technical, we need to have a look at how the source project models the states:</p>
+<pre><code class="language-rs">// source: mod.rs (edited)
+
+pub fn build_input_scheduler() -&gt; Schedule {
+    Schedule::builder()
+        .add_system(player_input::player_input_system())
+        .add_system(map_render::map_render_system())
+        .add_system(entity_render::entity_render_system())
+}
+
+pub fn build_player_scheduler() -&gt; Schedule {
+    Schedule::builder()
+        .add_system(collisions::collisions_system())
+        .add_system(map_render::map_render_system())
+        .add_system(entity_render::entity_render_system())
+        .add_system(end_turn::end_turn_system())
+}
+
+pub fn build_monster_scheduler() -&gt; Schedule {
+    Schedule::builder()
+        .add_system(random_move::random_move_system())
+        .add_system(collisions::collisions_system())
+        .add_system(map_render::map_render_system())
+        .add_system(entity_render::entity_render_system())
+        .add_system(end_turn::end_turn_system())
+}
+</code></pre>
+<p>We observe that there are three states:</p>
+<ol>
+<li>player input</li>
+<li>collision handling (following player move)</li>
+<li>monster moving, and collision handling</li>
+</ol>
+<p>Every state performs rendering; state change is performed in two different ways:</p>
+<ul>
+<li>on the player input state, performed by the <code>player_input</code> system, when the user presses a key;</li>
+<li>on the other states, performed by an adhoc system.</li>
+</ul>
+<p>As previously mentioned, Bevy does have a concept semantically similar to Legion's <code>Schedule</code>, however, it's more complicated, and it's better/closer modeled by a set of other types.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="a-basic-states-model-in-bevy"><a class="header" href="#a-basic-states-model-in-bevy">A basic states model in Bevy</a></h1>
+<h2 id="states-modeling-problems-in-bevy-v07"><a class="header" href="#states-modeling-problems-in-bevy-v07">States modeling problems in Bevy v0.7</a></h2>
+<p>Prior to any discussion, it must be pointed out that Bevy's state modeling <em>as a whole</em>, as of v0.7, it's broken: using the related APIs to their full extent in a project, will cause breakages (e.g. Bevy will hang); a typical example is that one can't use <code>FixedTimeStep</code>s and <code>State</code>s at the same time, or, in the case of this project, <code>State</code>s with <code>Stage</code>s.</p>
+<p>Fortunately, a 3rd party developer has created a plugin that solves this problem: <a href="https://github.com/IyesGames/iyes_loopless"><code>iyes_loopless</code></a>. In order to proceed with the next steps, it's therefore necessary to add it to the Cargo configuration.</p>
+<p>As of June 2022, it's planned for future Bevy versions to integrate the <code>iyes_loopless</code> logic in Bevy.</p>
+<h2 id="first-concept-stages"><a class="header" href="#first-concept-stages">First concept: <code>Stage</code>s</a></h2>
+<p>In the previous chapter, we've seen the source project's states model. In order to translate it in Bevy, we'll use three major concepts; the first one is <code>Stage</code>s.</p>
+<p>On each frame, Bevy's scheduler goes through a predefined set of so-called <code>Stage</code>s, which are essentially group of operations performed on a schedule; they are the appropriate abstraction to use (for reasons we'll see in the following chapters) to model states.</p>
+<p>By default, Bevy has several stages, however, we're interested only in one: the <code>Update</code> stage; the reason is that during the other stages, other operations are performed behind the scenes, and especially in a simple project, one doesn't want to touch them.</p>
+<p>In order to accommodate the states we need, we can add new stages - the idea is that we schedule them to be run in the order we want, but always after <code>Update</code> and before the stage following it by default (called <code>PostUpdate</code>).</p>
 
                     </main>
 
