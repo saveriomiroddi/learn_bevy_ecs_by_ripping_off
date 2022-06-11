@@ -18,3 +18,9 @@
 
 - [Introduction to step 06.02](./06_02/introduction.md)
 - [Querying: Entities and Param sets](./06_02/querying_entities_and_param_sets.md)
+
+# 07.01-02: Turn-based Games: Wandering/Turn-based
+
+- [Introduction to steps 07.01-02](./07_01-02/introduction.md)
+- [A look at the states model in the source project](./07_01-02/a_look_at_the_states_model_in_the_source_project.md)
+- [A basic states model in Bevy](./07_01-02/a_basic_states_model_in_bevy.md)
