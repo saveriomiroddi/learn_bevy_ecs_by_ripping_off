@@ -24,3 +24,4 @@
 - [Introduction to steps 07.01-02](./07_01-02/introduction.md)
 - [A look at the states model in the source project](./07_01-02/a_look_at_the_states_model_in_the_source_project.md)
 - [A basic states model in Bevy](./07_01-02/a_basic_states_model_in_bevy.md)
+- [Designing the states](./07_01-02/designing_the_states.md)
