@@ -12,13 +12,12 @@ First, let's define the stages:
 #[derive(Debug, Clone, Eq, PartialEq, Hash, StageLabel)]
 pub enum GameStage {
     MovePlayer,
-    PlayerCollisions,
     MoveMonsters,
     MonsterCollisions,
 }
 ```
 
-Is there one missing? No! For simplicity, we're going to use Bevy's standard one, `Update`, for the rendering. It's perfectly possible to leave `Update` untouched, and add an extra state for the rendering; it's up to the developer's taste.
+Is there one missing? No! For simplicity, we're going to use Bevy's standard one, `Update`, for the rendering and player input. It's perfectly possible to leave `Update` untouched, and add an extra state for those systems; it's up to the developer's taste.
 
 Now, we'll need to register them; this is performed via some `App` APIs, of which, for simplicity, we'll use just one, `add_stage_after`:
 
@@ -26,8 +25,7 @@ Now, we'll need to register them; this is performed via some `App` APIs, of whic
 // Port: main.rs
 
 ecs.add_stage_after(CoreStage::Update, MovePlayer, SystemStage::parallel())
-    .add_stage_after(MovePlayer, PlayerCollisions, SystemStage::parallel())
-    .add_stage_after(PlayerCollisions, MoveMonsters, SystemStage::parallel())
+    .add_stage_after(MovePlayer, MoveMonsters, SystemStage::parallel())
     .add_stage_after(MoveMonsters, MonsterCollisions, SystemStage::parallel());
 ```
 
@@ -56,7 +54,7 @@ We don't need to register the states, but we need to tell the scheduler which is
 ecs.add_loopless_state(TurnState::AwaitingInput);
 ```
 
-This is again, an API of `App`.
+This is again, an API of `App` (but added by `iyes_loopless`).
 
 ## Setting the `SystemSet`s
 
@@ -104,3 +102,53 @@ pub fn build_system_sets(app: &mut App) {
     );
 }
 ```
+
+The state handling is done; let's review it.
+
+First, rendering:
+
+```rs
+    app.add_system_set(
+        SystemSet::new()
+            .with_system(map_render::map_render)
+            .with_system(entity_render::entity_render),
+    );
+```
+
+By not specifying the stage, we're adding those systems to the `Update` stage. We're also not specifying a state, as we don't strictly need it; we could bind it to the `AwaitingInput` state, but conceptually speaking, there isn't such connection.
+
+Note how there is no temporal dependency between the two rendering systems (therefore, they will run in parallel); since they can execute independently (they draw to two different planes), we take the chance to parallelize them.
+
+Now, the player input:
+
+```rs
+    app.add_system(
+        player_input::player_input
+            .run_in_state(AwaitingInput)
+    );
+```
+
+This also goes in `Update`, however, we slot it in the associated game state (`AwaitingInput`).
+
+Now, the player move:
+
+```rs
+    app.add_system_set_to_stage(
+        GameStage::MovePlayer,
+        ConditionSet::new()
+            .run_in_state(TurnState::PlayerTurn)
+            .with_system(collisions::collisions)
+            .with_system(end_turn::end_turn)
+            .into(),
+    );
+```
+
+There are a few notable things here. First, we need to invoke `ConditionSet#into()` - this is because such type belongs to the `iyes_loopless` crate, and it needs to be converted to make it compatible with Bevy's `add_system_set_to_stage` APIs.
+
+Then, we're now adding the system set to a stage (`MovePlayer`).
+
+Like for rendering, we run the systems in parallel. Since we are sure that Bevy will wait for both systems to complete before moving to the next stage (`MoveMonsters`), there's no risk of a race condition.
+
+The rest of the systems follow the same structure.
+
+A small detail not to forget is turn state change is performed by the state machine system `end_turn`, but not in the `AwaitingInput` state - in this case, it's performed by the `player_input` system (since it depends on the user input).
