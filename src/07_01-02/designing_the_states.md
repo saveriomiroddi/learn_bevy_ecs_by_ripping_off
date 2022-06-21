@@ -84,12 +84,22 @@ We need a small modification here 😉 If the player doesn't send any input, the
 
 Excellent. From the user perspective, if we render at the beginning of a frame, or at the end of the previous one, it makes no difference - except that, with the former approach, we've solved the rendering problem.
 
+We can go further! we don't strictly need to sequentially render and get the player input in a sequence; this is a slow game, and rendering a tiny fraction of second after won't make any difference; the new plan is therefore:
+
+| stage description         | source scheduler number | stage count |
+| ------------------------- | :---------------------: | :---------: |
+| render+get player input   |           4+1           |      1      |
+| handle player collisions  |            2            |      2      |
+| move monsters             |            3            |      3      |
+| handle monster collisions |            3            |      4      |
+
+Notice that when we talk about a tiny fraction of second, it not _one frame_ of delay; the input/rendering systems are rendered in parallel (as opposed to in a sequence), so there is virtually zero delay.
+
 ## Summary of the design
 
-With the design above, we now have 5 stages:
+With the design above, we now have 4 stages:
 
-- render
-- get player input
+- render+get player input
 - handle player collisions
 - move monsters
 - handle monster collisions

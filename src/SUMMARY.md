@@ -25,3 +25,4 @@
 - [A look at the states model in the source project](./07_01-02/a_look_at_the_states_model_in_the_source_project.md)
 - [A basic states model in Bevy](./07_01-02/a_basic_states_model_in_bevy.md)
 - [Designing the states](./07_01-02/designing_the_states.md)
+- [Implementing the states in Bevy](./07_01-02/implementing_the_states_in_bevy.md)
