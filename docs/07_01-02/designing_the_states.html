@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="../06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="../06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li><li class="chapter-item expanded affix "><li class="part-title">07.01-02: Turn-based Games: Wandering/Turn-based</li><li class="chapter-item expanded "><a href="../07_01-02/introduction.html"><strong aria-hidden="true">11.</strong> Introduction to steps 07.01-02</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_look_at_the_states_model_in_the_source_project.html"><strong aria-hidden="true">12.</strong> A look at the states model in the source project</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_basic_states_model_in_bevy.html"><strong aria-hidden="true">13.</strong> A basic states model in Bevy</a></li><li class="chapter-item expanded "><a href="../07_01-02/designing_the_states.html" class="active"><strong aria-hidden="true">14.</strong> Designing the states</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="../06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="../06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li><li class="chapter-item expanded affix "><li class="part-title">07.01-02: Turn-based Games: Wandering/Turn-based</li><li class="chapter-item expanded "><a href="../07_01-02/introduction.html"><strong aria-hidden="true">11.</strong> Introduction to steps 07.01-02</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_look_at_the_states_model_in_the_source_project.html"><strong aria-hidden="true">12.</strong> A look at the states model in the source project</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_basic_states_model_in_bevy.html"><strong aria-hidden="true">13.</strong> A basic states model in Bevy</a></li><li class="chapter-item expanded "><a href="../07_01-02/designing_the_states.html" class="active"><strong aria-hidden="true">14.</strong> Designing the states</a></li><li class="chapter-item expanded "><a href="../07_01-02/implementing_the_states_in_bevy.html"><strong aria-hidden="true">15.</strong> Implementing the states in Bevy</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -214,11 +214,18 @@ pub fn build_monster_scheduler() -&gt; Schedule {
 <tr><td>handle monster collisions</td><td align="center">3</td><td align="center">5</td></tr>
 </tbody></table>
 <p>Excellent. From the user perspective, if we render at the beginning of a frame, or at the end of the previous one, it makes no difference - except that, with the former approach, we've solved the rendering problem.</p>
+<p>We can go further! we don't strictly need to sequentially render and get the player input in a sequence; this is a slow game, and rendering a tiny fraction of second after won't make any difference; the new plan is therefore:</p>
+<table><thead><tr><th>stage description</th><th align="center">source scheduler number</th><th align="center">stage count</th></tr></thead><tbody>
+<tr><td>render+get player input</td><td align="center">4+1</td><td align="center">1</td></tr>
+<tr><td>handle player collisions</td><td align="center">2</td><td align="center">2</td></tr>
+<tr><td>move monsters</td><td align="center">3</td><td align="center">3</td></tr>
+<tr><td>handle monster collisions</td><td align="center">3</td><td align="center">4</td></tr>
+</tbody></table>
+<p>Notice that when we talk about a tiny fraction of second, it not <em>one frame</em> of delay; the input/rendering systems are rendered in parallel (as opposed to in a sequence), so there is virtually zero delay.</p>
 <h2 id="summary-of-the-design"><a class="header" href="#summary-of-the-design">Summary of the design</a></h2>
-<p>With the design above, we now have 5 stages:</p>
+<p>With the design above, we now have 4 stages:</p>
 <ul>
-<li>render</li>
-<li>get player input</li>
+<li>render+get player input</li>
 <li>handle player collisions</li>
 <li>move monsters</li>
 <li>handle monster collisions</li>
@@ -238,6 +245,9 @@ pub fn build_monster_scheduler() -&gt; Schedule {
                             <a rel="prev" href="../07_01-02/a_basic_states_model_in_bevy.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
+                            <a rel="next" href="../07_01-02/implementing_the_states_in_bevy.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         <div style="clear: both"></div>
                     </nav>
                 </div>
@@ -246,6 +256,9 @@ pub fn build_monster_scheduler() -&gt; Schedule {
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                     <a rel="prev" href="../07_01-02/a_basic_states_model_in_bevy.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="../07_01-02/implementing_the_states_in_bevy.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
 
