@@ -30,3 +30,4 @@
 # 07.03: Turn-based Games: Intent
 
 - [Introduction to step 07.03](./07_03/introduction.md)
+- [Managed event passing](./07_03/managed_event_passing.md)
