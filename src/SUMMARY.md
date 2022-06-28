@@ -26,3 +26,7 @@
 - [A basic states model in Bevy](./07_01-02/a_basic_states_model_in_bevy.md)
 - [Designing the states](./07_01-02/designing_the_states.md)
 - [Implementing the states in Bevy](./07_01-02/implementing_the_states_in_bevy.md)
+
+# 07.03: Turn-based Games: Intent
+
+- [Introduction to step 07.03](./07_03/introduction.md)
