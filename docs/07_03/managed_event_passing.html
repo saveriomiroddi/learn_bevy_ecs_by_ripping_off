@@ -1,0 +1,316 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Managed event passing - Learn Bevy&#x27;s ECS by ripping off someone else&#x27;s project</title>
+        <!-- Custom HTML head -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-B7KRHPXLYN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-B7KRHPXLYN');
+</script>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="../06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="../06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li><li class="chapter-item expanded affix "><li class="part-title">07.01-02: Turn-based Games: Wandering/Turn-based</li><li class="chapter-item expanded "><a href="../07_01-02/introduction.html"><strong aria-hidden="true">11.</strong> Introduction to steps 07.01-02</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_look_at_the_states_model_in_the_source_project.html"><strong aria-hidden="true">12.</strong> A look at the states model in the source project</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_basic_states_model_in_bevy.html"><strong aria-hidden="true">13.</strong> A basic states model in Bevy</a></li><li class="chapter-item expanded "><a href="../07_01-02/designing_the_states.html"><strong aria-hidden="true">14.</strong> Designing the states</a></li><li class="chapter-item expanded "><a href="../07_01-02/implementing_the_states_in_bevy.html"><strong aria-hidden="true">15.</strong> Implementing the states in Bevy</a></li><li class="chapter-item expanded affix "><li class="part-title">07.03: Turn-based Games: Intent</li><li class="chapter-item expanded "><a href="../07_03/introduction.html"><strong aria-hidden="true">16.</strong> Introduction to step 07.03</a></li><li class="chapter-item expanded "><a href="../07_03/managed_event_passing.html" class="active"><strong aria-hidden="true">17.</strong> Managed event passing</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Learn Bevy&#x27;s ECS by ripping off someone else&#x27;s project</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="managed-event-passing"><a class="header" href="#managed-event-passing">Managed event passing</a></h1>
+<p>This chapter presents an interesting departure from the source project! We're going to implement event passing; this is interesting because it's possible to observe the improvements offered compared to manual event handling (which is the implementation chosen in the source project).</p>
+<h2 id="a-look-at-a-manual-implementation"><a class="header" href="#a-look-at-a-manual-implementation">A look at a manual implementation</a></h2>
+<p>Let's see what the source project implementation. Since the messages are regular entities, first, they need to be declared:</p>
+<pre><code class="language-rs">// Source: component.rs
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WantsToMove {
+    pub entity: Entity,
+    pub destination: Point,
+}
+</code></pre>
+<p>Now, they're simply added to the world:</p>
+<pre><code class="language-rs">// Source: player_input.rs (edited)
+
+pub fn player_input(
+    commands: &amp;mut CommandBuffer,
+) {
+    // ...
+
+    // Legion’s push function doesn’t work with single-component insertions
+
+    commands.push((
+        (),
+        WantsToMove {
+            entity: *player_entity,
+            destination: player_destination,
+        },
+    ));
+
+    // ...
+}
+</code></pre>
+<p>Here we observe a small limitation of Legion, in particular, when used for events - it doesn't accept insertion of individual components, so we need to add a phony one (the empty tuple <code>()</code>).</p>
+<p>Reading is performed via a standard query:</p>
+<pre><code class="language-rs">// Source: movement.rs (extract)
+
+pub fn movement(
+    entity: &amp;Entity,
+    want_move: &amp;WantsToMove,
+    // ...
+    commands: &amp;mut CommandBuffer,
+) {
+    if map.can_enter_tile(want_move.destination) {
+        // ... operate on `want_move`
+    }
+
+    commands.remove(*entity);
+}
+</code></pre>
+<p>Note how we have to manually remove the pseudo-message entity.</p>
+<p>That's all. This implementation is very simple, which works well in the design of this game.</p>
+<h2 id="bevys-event-passing"><a class="header" href="#bevys-event-passing">Bevy's Event passing</a></h2>
+<p>Bevy's managed event passing is equally simple. We define the event type, and we register it:</p>
+<pre><code class="language-rs">// Port: events.rs
+
+pub struct WantsToMove {
+    pub entity: Entity,
+    pub destination: Point,
+}
+
+// Port: main.rs
+
+ecs.add_event::&lt;WantsToMove&gt;();
+</code></pre>
+<p>Note that differently from entities, message types don't need to be derived as components; in the port, this gives a minor simplification - we don't need to use the wrapper component <code>PointC</code> - we use just <code>Point</code>.</p>
+<p>Now, let's send the events:</p>
+<pre><code class="language-rs">// Port: player_input.rs (edit)
+
+pub fn player_input(
+    mut move_events: EventWriter&lt;WantsToMove&gt;,
+) {
+    // ... compute the player destination ...
+
+    move_events.send(WantsToMove {
+        entity: *player_entity,
+        destination: player_destination,
+    });
+
+    // ...
+}
+</code></pre>
+<p>and read them:</p>
+<pre><code class="language-rs">// Port: movement.rs (edit)
+
+pub fn movement(
+    mut move_events: EventReader&lt;WantsToMove&gt;,
+    // ...
+) {
+    for &amp;WantsToMove {
+        entity,
+        destination,
+    } in move_events.iter()
+    {
+        if map.can_enter_tile(destination) {
+            // ... operate on entity/destination
+        }
+    }
+}
+</code></pre>
+<p>Very straightforward. There is a very important difference of the port: we don't need to remove the message; this is taken care of by Bevy.</p>
+<h2 id="systems-ordering"><a class="header" href="#systems-ordering">Systems ordering</a></h2>
+<p>There are two crucial concepts to be aware of, when using Bevy's events:</p>
+<ol>
+<li>events persist for at most two frames - the frame where the event is sent, and the next;</li>
+<li>the developer must take care of the systems ordering, in order to read the events as soon as possible.</li>
+</ol>
+<p>In some games, lag is not a problem, however, in some others, if the systems ordering is improperly designed, event reading may be lag, and the lag can propagate to other systems/frames.</p>
+<p>It's therefore useful to review how system ordering is designed in the port, at this stage:</p>
+<pre><code class="language-rs">// Port: mod.rs (extract)
+
+// Here we write the event; this is the default (Update) stage.
+//
+app.add_system(
+    player_input::player_input.run_in_state(AwaitingInput)
+);
+
+// Here we read the events; the stage is the next, which guarantees the ordering.
+//
+app.add_system_set_to_stage(
+    MovePlayer,
+    ConditionSet::new()
+        .run_in_state(PlayerTurn)
+        .with_system(movement::movement) // reads the event
+        .into(),
+);
+</code></pre>
+<p>We don't need to introduce any syncing (ie. extra stages) - the project's states and actions are well-defined, so the sync points (implemented via stages) fit cleanly and, in this case, for free.</p>
+<h2 id="considerations"><a class="header" href="#considerations">Considerations</a></h2>
+<p>Whether to use or not managed event passing, is a valid question; after all, one can just write entities, send them around, then remove them. In the context of this project, the advantages that managed events passing gives are:</p>
+<ul>
+<li>it avoids manual removal of the messages;</li>
+<li>the implementation is semantically more consistent with its intent;</li>
+<li>as a consequence of the previous point, workarounds are not necessary.</li>
+</ul>
+<p>These don't constitute a very significant improvement, however, given the simplicity of Bevy's API, in my opinion, using it is a no-brainer.</p>
+<p>One larger projects, when there are multiple readers, the advantage of not having to manually clear the events, is definitely more significant.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../07_03/introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../07_03/introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>

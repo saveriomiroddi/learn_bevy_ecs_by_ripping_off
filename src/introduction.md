@@ -15,7 +15,7 @@ The steps have been numbered (and have matching names in the source/port), in or
 
 This book presents multiple chapters for each step, explaining the concepts involved. When reading a chapter, one can compare the source step (workspace) with the ported one, and/or with the previous step in the respective project.
 
-The starting chapter is 06.01, where an ECS is introduced in the design.
+The starting chapter is 06.01, where an ECS is introduced in the design. Steps that don't introduce any new ECS concept, or don't significantly extend an introduced one, are skipped.
 
 It's technically possible to read this book standalone, without the source one, but for newcomers to ECS, it's not advised, as in this context I'm not explaining the ECS concepts (only their Bevy API implementation).
 
