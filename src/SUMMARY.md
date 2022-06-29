@@ -31,3 +31,9 @@
 
 - [Introduction to step 07.03](./07_03/introduction.md)
 - [Managed event passing](./07_03/managed_event_passing.md)
+
+# 09.02: Winning and Losing: Losing
+
+- [Introduction to step 09.02](./09_02/introduction.md)
+- [Bevy's World](./09_02/bevys_world.md)
+
