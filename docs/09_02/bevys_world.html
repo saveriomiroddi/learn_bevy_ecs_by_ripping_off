@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Base structure - Learn Bevy&#x27;s ECS by ripping off someone else&#x27;s project</title>
+        <title>Bevy&#x27;s World - Learn Bevy&#x27;s ECS by ripping off someone else&#x27;s project</title>
         <!-- Custom HTML head -->
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-B7KRHPXLYN"></script>
@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html" class="active"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="../06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="../06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li><li class="chapter-item expanded affix "><li class="part-title">07.01-02: Turn-based Games: Wandering/Turn-based</li><li class="chapter-item expanded "><a href="../07_01-02/introduction.html"><strong aria-hidden="true">11.</strong> Introduction to steps 07.01-02</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_look_at_the_states_model_in_the_source_project.html"><strong aria-hidden="true">12.</strong> A look at the states model in the source project</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_basic_states_model_in_bevy.html"><strong aria-hidden="true">13.</strong> A basic states model in Bevy</a></li><li class="chapter-item expanded "><a href="../07_01-02/designing_the_states.html"><strong aria-hidden="true">14.</strong> Designing the states</a></li><li class="chapter-item expanded "><a href="../07_01-02/implementing_the_states_in_bevy.html"><strong aria-hidden="true">15.</strong> Implementing the states in Bevy</a></li><li class="chapter-item expanded affix "><li class="part-title">07.03: Turn-based Games: Intent</li><li class="chapter-item expanded "><a href="../07_03/introduction.html"><strong aria-hidden="true">16.</strong> Introduction to step 07.03</a></li><li class="chapter-item expanded "><a href="../07_03/managed_event_passing.html"><strong aria-hidden="true">17.</strong> Managed event passing</a></li><li class="chapter-item expanded affix "><li class="part-title">09.02: Winning and Losing: Losing</li><li class="chapter-item expanded "><a href="../09_02/introduction.html"><strong aria-hidden="true">18.</strong> Introduction to step 09.02</a></li><li class="chapter-item expanded "><a href="../09_02/bevys_world.html"><strong aria-hidden="true">19.</strong> Bevy's World</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><li class="part-title">06.01: Entities, Components and Systems: Player ECS</li><li class="chapter-item expanded "><a href="../06_01/introduction.html"><strong aria-hidden="true">2.</strong> Introduction to step 06.01</a></li><li class="chapter-item expanded "><a href="../06_01/base_structure.html"><strong aria-hidden="true">3.</strong> Base structure</a></li><li class="chapter-item expanded "><a href="../06_01/world_and_systems.html"><strong aria-hidden="true">4.</strong> World and systems</a></li><li class="chapter-item expanded "><a href="../06_01/components_entities_resources.html"><strong aria-hidden="true">5.</strong> Components, entities and resources</a></li><li class="chapter-item expanded "><a href="../06_01/keyboard_input.html"><strong aria-hidden="true">6.</strong> Keyboard input</a></li><li class="chapter-item expanded "><a href="../06_01/system_sets_introduction.html"><strong aria-hidden="true">7.</strong> Introduction to System sets</a></li><li class="chapter-item expanded "><a href="../06_01/query_basics.html"><strong aria-hidden="true">8.</strong> Query basics</a></li><li class="chapter-item expanded affix "><li class="part-title">06.02: Entities, Components and Systems: Dungeon ECS</li><li class="chapter-item expanded "><a href="../06_02/introduction.html"><strong aria-hidden="true">9.</strong> Introduction to step 06.02</a></li><li class="chapter-item expanded "><a href="../06_02/querying_entities_and_param_sets.html"><strong aria-hidden="true">10.</strong> Querying: Entities and Param sets</a></li><li class="chapter-item expanded affix "><li class="part-title">07.01-02: Turn-based Games: Wandering/Turn-based</li><li class="chapter-item expanded "><a href="../07_01-02/introduction.html"><strong aria-hidden="true">11.</strong> Introduction to steps 07.01-02</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_look_at_the_states_model_in_the_source_project.html"><strong aria-hidden="true">12.</strong> A look at the states model in the source project</a></li><li class="chapter-item expanded "><a href="../07_01-02/a_basic_states_model_in_bevy.html"><strong aria-hidden="true">13.</strong> A basic states model in Bevy</a></li><li class="chapter-item expanded "><a href="../07_01-02/designing_the_states.html"><strong aria-hidden="true">14.</strong> Designing the states</a></li><li class="chapter-item expanded "><a href="../07_01-02/implementing_the_states_in_bevy.html"><strong aria-hidden="true">15.</strong> Implementing the states in Bevy</a></li><li class="chapter-item expanded affix "><li class="part-title">07.03: Turn-based Games: Intent</li><li class="chapter-item expanded "><a href="../07_03/introduction.html"><strong aria-hidden="true">16.</strong> Introduction to step 07.03</a></li><li class="chapter-item expanded "><a href="../07_03/managed_event_passing.html"><strong aria-hidden="true">17.</strong> Managed event passing</a></li><li class="chapter-item expanded affix "><li class="part-title">09.02: Winning and Losing: Losing</li><li class="chapter-item expanded "><a href="../09_02/introduction.html"><strong aria-hidden="true">18.</strong> Introduction to step 09.02</a></li><li class="chapter-item expanded "><a href="../09_02/bevys_world.html" class="active"><strong aria-hidden="true">19.</strong> Bevy's World</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -143,82 +143,70 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="base-structure"><a class="header" href="#base-structure">Base structure</a></h1>
-<p>The very first step in the port is plugging Bevy's ECS. The source project has a mixed, game engine-wise, design:</p>
-<ul>
-<li>the game loop is managed by the game engine (<a href="https://github.com/amethyst/bracket-lib">bracket-lib</a>);</li>
-<li>for each cycle (frame), an update is invoked on the ECS (<a href="https://github.com/amethyst/legion">Legion</a>).</li>
-</ul>
-<p>This is bare-bones structure of the source project:</p>
-<pre><code class="language-rs">// source: main.rs
+                        <h1 id="bevys-world"><a class="header" href="#bevys-world">Bevy's World</a></h1>
+<p><code>World</code> was briefly mentioned in the <a href="../06_01/world_and_systems.html">World and systems</a> chapter. In general, there are two ways of accessing the <code>World</code> instance: from the <code>App</code> instance, and from a system.</p>
+<p>We've seen the first case:</p>
+<pre><code class="language-rs">// port: app.rs
 
-struct State {
-    ecs: World,
-    resources: Resources,
-    systems: Schedule,
-}
+let mut ecs = App::new();
+// ...
+spawn_player(&amp;mut ecs.world, map_builder.player_start);
 
-impl State {
-    fn new() -&gt; Self {
-        // [...]
-        Self {
-            ecs: World::default(),
-            resources: Resources::default(),
-            systems: build_scheduler(),
-        }
-    }
-}
+// port: spawner.rs
 
-impl GameState for State {
-    fn tick(&amp;mut self, ctx: &amp;mut BTerm) {
-        // [...]
-        self.systems.execute(&amp;mut self.ecs, &amp;mut self.resources);
-        render_draw_buffer(ctx).expect(&quot;Render error&quot;);
-    }
-}
-
-fn main() -&gt; BError {
-    // [...]
-    main_loop(context, State::new())
-}
+// The world instance is accessible via App#world.
+//
+world.spawn().insert_bundle((
+    Player,
+    PointC(pos),
+    Render {
+        color: ColorPair::new(WHITE, BLACK),
+        glyph: to_cp437('@'),
+    },
+));
 </code></pre>
-<p>The translation is straightforward:</p>
-<ul>
-<li><code>World</code> and <code>Resources</code> map to <a href="https://github.com/bevyengine/bevy/blob/83c6ffb73c4a91182cda10141f824987ef3fba2f/crates/bevy_app/src/app.rs#L46"><code>App</code></a> (which also owns the resources)</li>
-<li>Legion's systems update for each tick maps to the <a href="https://github.com/bevyengine/bevy/blob/83c6ffb73c4a91182cda10141f824987ef3fba2f/crates/bevy_app/src/app.rs#L111"><code>App#update()</code> API</a>.</li>
-</ul>
-<p>leading to:</p>
-<pre><code class="language-rs">// port: main.rs
-
-struct State {
-    ecs: App,
-}
-
-impl State {
-    fn new() -&gt; Self {
-        // [...]
-        Self { ecs: App::new() }
-    }
-}
-
-impl GameState for State {
-    fn tick(&amp;mut self, ctx: &amp;mut BTerm) {
-        // [...]
-        self.ecs.update();
-        render_draw_buffer(ctx).expect(&quot;Render error&quot;);
+<p>There's nothing notable in it; we're at the initialization state of the application, so we don't have specific concerns.</p>
+<p>In order to get access to <code>World</code> from a system, we just specify it as parameter:</p>
+<pre><code class="language-rs">pub fn world_read_system(world: &amp;World) {
+    if let Some(player) = world.entity(entity).get::&lt;Player&gt;() {
+        // ...
     }
 }
 </code></pre>
+<h2 id="exclusive-systems"><a class="header" href="#exclusive-systems">Exclusive systems</a></h2>
+<p>In the case of mutable <code>World</code> access, there are significant constraints.</p>
+<p>First, we need to mark the system as &quot;exclusive&quot; when adding it:</p>
+<pre><code class="language-rs">pub fn world_write_system(world: &amp;mut World) {
+    if let Some(player) = world.entity(entity).get_mut::&lt;Player&gt;() {
+        // ...
+    }
+}
+
+app.add_system(world_write_system.exclusive_system())
+</code></pre>
+<p>Second: mutable access to <code>World</code> is incompatible with other queries, for obvious reasons:</p>
+<pre><code class="language-rs">// This is not allowed!
+//
+pub fn not_working_exclusive_system(
+  world: &amp;mut World,
+  timer: ResMut&lt;MyTimer&gt;,
+) {
+  // in theory, here, we we'd have aliasing of the MyTimer resource
+}
+</code></pre>
+<p>Finally, and very importantly, exclusive systems can't be scheduled concurrently with other systems, potentially causing bottlenecks!</p>
+<h2 id="clearing-the-world"><a class="header" href="#clearing-the-world">Clearing the world</a></h2>
+<p>In some cases, we want to clear the entities in the world, for example, in order to partially perform a state cleanup (don't forget the resources!); this is easily accomplished:</p>
+<pre><code class="language-rs">world.clear_entities();
+</code></pre>
+<p>As of Jun/2022, there is no way to clear resources; however, while there's a <a href="https://github.com/bevyengine/bevy/pull/3212">PR open</a>, it must be very clear that one can't just clear all the resources, since Bevy uses resources for various tasks - fully clearing the world would likely bring Bevy to an unusable state.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../06_01/introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../09_02/introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
-                            </a>
-                            <a rel="next" href="../06_01/world_and_systems.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
                     </nav>
@@ -226,11 +214,8 @@ impl GameState for State {
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../06_01/introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../09_02/introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
-                    </a>
-                    <a rel="next" href="../06_01/world_and_systems.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
 
