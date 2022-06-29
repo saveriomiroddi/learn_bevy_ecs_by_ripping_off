@@ -42,3 +42,9 @@
 # Conclusion
 
 - [Conclusion](./conclusion/conclusion.md)
+
+-----
+
+# Appendix
+
+- [Exercise for the reader](./appendix/exercise_for_the_reader.md)
