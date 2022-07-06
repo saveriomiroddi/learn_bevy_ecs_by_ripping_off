@@ -1,5 +1,7 @@
 # Implementing the states in Bevy
 
+**WARNING**: This chapter has a conceptual error - in order to define state conditionals, a standard resource should be used (and the related conditional API), not `NextState`. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.
+
 In this chapter, we'll use the `iyes_loopless` Bevy crate!
 
 ## Adding the stages

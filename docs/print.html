@@ -655,10 +655,12 @@ stack backtrace:
 </code></pre>
 <p>There's no significant difference; we just group the queries inside a <code>ParamSet</code>, and access them via <code>pN()</code> functions. Considering the constraint, this is impressively ergonomic!</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="introduction-to-steps-0701-02"><a class="header" href="#introduction-to-steps-0701-02">Introduction to steps 07.01-02</a></h1>
+<p><strong>WARNING</strong>: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not <code>NextState</code>. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.</p>
 <p>This chapter covers both steps 07.01 and 07.02; we're going to explore <code>State</code>s, <code>SystemSet</code>s and <code>Stage</code>s (and the <code>iyes_loopless</code> crate).</p>
 <p>The Bevy concepts described here are the foundation for structuring games, and this step is the one that departs the most from the source project.</p>
 <p>The directory names are <code>07_TurnBasedGames_01_wandering</code> and <code>07_TurnBasedGames_02_turnbased</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="a-look-at-the-states-model-in-the-source-project"><a class="header" href="#a-look-at-the-states-model-in-the-source-project">A look at the states model in the source project</a></h1>
+<p><strong>WARNING</strong>: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not <code>NextState</code>. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.</p>
 <h2 id="source-structure-and-bevys-stages"><a class="header" href="#source-structure-and-bevys-stages">Source structure, and Bevy's <code>Stage</code>s</a></h2>
 <p>Before getting technical, we need to have a look at how the source project models the states:</p>
 <pre><code class="language-rs">// source: mod.rs (edited)
@@ -726,6 +728,7 @@ pub fn build_monster_scheduler() -&gt; Schedule {
 </ul>
 <p>This is not dramatic, but there is certainly an increase of the complexity that we'll need to handle; fortunately, in our case, we can reduce the number of stages.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="a-basic-states-model-in-bevy"><a class="header" href="#a-basic-states-model-in-bevy">A basic states model in Bevy</a></h1>
+<p><strong>WARNING</strong>: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not <code>NextState</code>. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.</p>
 <h2 id="states-modeling-problems-in-bevy-v07"><a class="header" href="#states-modeling-problems-in-bevy-v07">States modeling problems in Bevy v0.7</a></h2>
 <p>Prior to any discussion, it must be pointed out that Bevy's state modeling <em>as a whole</em>, as of v0.7, it's broken: using the related APIs to their full extent in a project, will cause breakages (e.g. Bevy will hang); a typical example is that one can't use <code>FixedTimeStep</code>s and <code>State</code>s at the same time, or, in the case of this project, <code>State</code>s with <code>Stage</code>s.</p>
 <p>Fortunately, a 3rd party developer has created a plugin that solves this problem: <a href="https://github.com/IyesGames/iyes_loopless"><code>iyes_loopless</code></a>. In order to proceed with the next steps, it's therefore necessary to add it to the Cargo configuration.</p>
@@ -736,6 +739,7 @@ pub fn build_monster_scheduler() -&gt; Schedule {
 <p>By default, Bevy has several stages, however, we're interested only in one: the <code>Update</code> stage; the reason is that during the other stages, other operations are performed behind the scenes, and especially in a simple project, one doesn't want to touch them.</p>
 <p>In order to accommodate the states we need, we can add new stages - the idea is that we schedule them to be run in the order we want, but always after <code>Update</code> and before the stage following it by default (called <code>PostUpdate</code>).</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="designing-the-states"><a class="header" href="#designing-the-states">Designing the states</a></h1>
+<p><strong>WARNING</strong>: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not <code>NextState</code>. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.</p>
 <p>Now that we've examined all the concepts involved, let's design the Bevy's states.</p>
 <p>We'll use the following code as reference, which is the source project as of this step:</p>
 <pre><code class="language-rs">// source: mod.rs
@@ -830,6 +834,7 @@ pub fn build_monster_scheduler() -&gt; Schedule {
 </ul>
 <p>Remember: states are used to represent high-level game states, while stages are subdivisions of the states, for transactional purposes.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="implementing-the-states-in-bevy"><a class="header" href="#implementing-the-states-in-bevy">Implementing the states in Bevy</a></h1>
+<p><strong>WARNING</strong>: This chapter has a conceptual error - in order to define state conditionals, a standard resource should be used (and the related conditional API), not <code>NextState</code>. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.</p>
 <p>In this chapter, we'll use the <code>iyes_loopless</code> Bevy crate!</p>
 <h2 id="adding-the-stages"><a class="header" href="#adding-the-stages">Adding the stages</a></h2>
 <p>First, let's define the stages:</p>
