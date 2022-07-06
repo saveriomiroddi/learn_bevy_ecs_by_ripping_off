@@ -144,6 +144,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="a-basic-states-model-in-bevy"><a class="header" href="#a-basic-states-model-in-bevy">A basic states model in Bevy</a></h1>
+<p><strong>WARNING</strong>: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not <code>NextState</code>. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.</p>
 <h2 id="states-modeling-problems-in-bevy-v07"><a class="header" href="#states-modeling-problems-in-bevy-v07">States modeling problems in Bevy v0.7</a></h2>
 <p>Prior to any discussion, it must be pointed out that Bevy's state modeling <em>as a whole</em>, as of v0.7, it's broken: using the related APIs to their full extent in a project, will cause breakages (e.g. Bevy will hang); a typical example is that one can't use <code>FixedTimeStep</code>s and <code>State</code>s at the same time, or, in the case of this project, <code>State</code>s with <code>Stage</code>s.</p>
 <p>Fortunately, a 3rd party developer has created a plugin that solves this problem: <a href="https://github.com/IyesGames/iyes_loopless"><code>iyes_loopless</code></a>. In order to proceed with the next steps, it's therefore necessary to add it to the Cargo configuration.</p>
