@@ -1,7 +1,5 @@
 # A look at the states model in the source project
 
-**WARNING**: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not `NextState`. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.
-
 ## Source structure, and Bevy's `Stage`s
 
 Before getting technical, we need to have a look at how the source project models the states:
