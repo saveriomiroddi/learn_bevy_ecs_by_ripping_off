@@ -33,7 +33,7 @@ Note that we're specifying that we want to run the systems of each stage in para
 
 ## Adding the states
 
-Now, let's define the states:
+Now, let's define the states, which are encoded using a standard Bevy resource:
 
 ```rs
 // Port: turn_state.rs
@@ -46,15 +46,15 @@ pub enum TurnState {
 }
 ```
 
-We don't need to register the states, but we need to tell the scheduler which is the starting one:
+We set the initial state by adding the resource to the ECS:
 
 ```rs
 // Port: main.rs
 
-ecs.add_loopless_state(TurnState::AwaitingInput);
+ecs.insert_resource(TurnState::AwaitingInput);
 ```
 
-This is again, an API of `App` (but added by `iyes_loopless`).
+In the next section, we'll encode the conditions.
 
 ## Setting the `SystemSet`s
 
@@ -72,13 +72,13 @@ pub fn build_system_sets(app: &mut App) {
 
     app.add_system(
         player_input::player_input
-            .run_in_state(AwaitingInput)
+            .run_if_resource_equals(TurnState::AwaitingInput)
     );
 
     app.add_system_set_to_stage(
         GameStage::MovePlayer,
         ConditionSet::new()
-            .run_in_state(TurnState::PlayerTurn)
+            .run_if_resource_equals(TurnState::PlayerTurn)
             .with_system(collisions::collisions)
             .with_system(end_turn::end_turn)
             .into(),
@@ -87,7 +87,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         GameStage::MoveMonsters,
         ConditionSet::new()
-            .run_in_state(TurnState::MonsterTurn)
+            .run_if_resource_equals(TurnState::MonsterTurn)
             .with_system(random_move::random_move)
             .into(),
     );
@@ -95,7 +95,7 @@ pub fn build_system_sets(app: &mut App) {
     app.add_system_set_to_stage(
         GameStage::MonsterCollisions,
         ConditionSet::new()
-            .run_in_state(TurnState::MonsterTurn)
+            .run_if_resource_equals(TurnState::MonsterTurn)
             .with_system(collisions::collisions)
             .with_system(end_turn::end_turn)
             .into(),
@@ -124,11 +124,11 @@ Now, the player input:
 ```rs
     app.add_system(
         player_input::player_input
-            .run_in_state(AwaitingInput)
+            .run_if_resource_equals(TurnState::AwaitingInput)
     );
 ```
 
-This also goes in `Update`, however, we slot it in the associated game state (`AwaitingInput`).
+This also goes in `Update`, however, we slot it in the associated game state (`AwaitingInput`). Note how we encode the conditional using the `run_if_resource_equals()` `iyes_loopless` API; it allows a system/set to run if the ECS includes an enum resource whose variant is the one specified.
 
 Now, the player move:
 
@@ -136,7 +136,7 @@ Now, the player move:
     app.add_system_set_to_stage(
         GameStage::MovePlayer,
         ConditionSet::new()
-            .run_in_state(TurnState::PlayerTurn)
+            .run_if_resource_equals(TurnState::PlayerTurn)
             .with_system(collisions::collisions)
             .with_system(end_turn::end_turn)
             .into(),
@@ -151,4 +151,12 @@ Like for rendering, we run the systems in parallel. Since we are sure that Bevy 
 
 The rest of the systems follow the same structure.
 
-A small detail not to forget is turn state change is performed by the state machine system `end_turn`, but not in the `AwaitingInput` state - in this case, it's performed by the `player_input` system (since it depends on the user input).
+A small detail not to forget is turn state change is performed by the state machine system `end_turn`, but not in the `AwaitingInput` state - in this case, it's performed by the `player_input` system (since it depends on the user input):
+
+```rs
+// Port: player_input.rs (extract)
+
+commands.insert_resource(TurnState::PlayerTurn);
+```
+
+as you can see, changing state is just a matter of updating the state resource.
