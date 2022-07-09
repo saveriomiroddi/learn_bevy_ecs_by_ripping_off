@@ -130,6 +130,13 @@ Now, the player input:
 
 This also goes in `Update`, however, we slot it in the associated game state (`AwaitingInput`). Note how we encode the conditional using the `run_if_resource_equals()` `iyes_loopless` API; it allows a system/set to run if the ECS includes an enum resource whose variant is the one specified.
 
+It's extremely important *not* to use the `iyes_loopless` state management API (`run_in_state()`) for this purpose! While both are backed by resources, the difference is that the decision whether to run each system/set, is taken:
+
+- with the `run_in_state()` condition, once per frame, at the beginning of it;
+- with the `run_if_resource_equals()` condition, at the beginning of each stage.
+
+The consequence is that if we set a new state (by updating the resource) in a given stage, systems in subsequent stages with conditions encoded via `run_in_state()`, will not run, even if they match the new state, because the decision not to run them was taken at the beginning of the frame!
+
 Now, the player move:
 
 ```rs
