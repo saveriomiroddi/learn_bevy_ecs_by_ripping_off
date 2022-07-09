@@ -1,7 +1,5 @@
 # A basic states model in Bevy
 
-**WARNING**: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not `NextState`. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.
-
 ## States modeling problems in Bevy v0.7
 
 Prior to any discussion, it must be pointed out that Bevy's state modeling _as a whole_, as of v0.7, it's broken: using the related APIs to their full extent in a project, will cause breakages (e.g. Bevy will hang); a typical example is that one can't use `FixedTimeStep`s and `State`s at the same time, or, in the case of this project, `State`s with `Stage`s.

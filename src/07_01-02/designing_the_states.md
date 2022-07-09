@@ -1,7 +1,5 @@
 # Designing the states
 
-**WARNING**: This chapter has a conceptual error - in order to define state conditional, a standard resource should be used (and the related conditional API), not `NextState`. This is due to very poor documentation on this topic, and it's something that I'm going to fix shortly.
-
 Now that we've examined all the concepts involved, let's design the Bevy's states.
 
 We'll use the following code as reference, which is the source project as of this step:
