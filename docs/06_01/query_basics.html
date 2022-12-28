@@ -231,12 +231,13 @@ pub fn player_input(mut player_query: Query&lt;&amp;mut PointC, With&lt;Player&g
 </code></pre>
 <p>In this case we want to know the position of the player, in order to process it, but since we don't process the Player component, we don't retrieve it.</p>
 <p>There's a new API used here: <code>get_single()</code>; it is part of a family of APIs that allow access to a set of components in a query, without iteration:</p>
-<table><thead><tr><th>API</th><th style="text-align: center">Checked? (Ret. type)</th><th style="text-align: center">Access</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>API</th><th style="text-align: center">Checked? (Ret. type)</th><th style="text-align: center">Access</th></tr></thead><tbody>
 <tr><td><code>single()</code></td><td style="text-align: center">N (<code>T</code>)</td><td style="text-align: center">immutable</td></tr>
 <tr><td><code>single_mut()</code></td><td style="text-align: center">N (<code>T</code>)</td><td style="text-align: center">mutable</td></tr>
 <tr><td><code>get_single()</code></td><td style="text-align: center">Y (<code>Result&lt;T&gt;</code>)</td><td style="text-align: center">immutable</td></tr>
 <tr><td><code>get_single_mut()</code></td><td style="text-align: center">Y (<code>Result&lt;T&gt;</code>)</td><td style="text-align: center">mutable</td></tr>
 </tbody></table>
+</div>
 <p>(note that the return type is simplified)</p>
 <p>The APIs are easy to remember:</p>
 <ul>

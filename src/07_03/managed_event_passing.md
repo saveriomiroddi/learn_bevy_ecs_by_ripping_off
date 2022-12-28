@@ -170,3 +170,9 @@ Whether to use or not managed event passing, is a valid question; after all, one
 These don't constitute a very significant improvement, however, given the simplicity of Bevy's API, in my opinion, using it is a no-brainer.
 
 One larger projects, when there are multiple readers, the advantage of not having to manually clear the events, is definitely more significant.
+
+## Bug in the port project
+
+There is a bug in the design of the port project 😅: events are processed twice, since the event reading systems are scheduled twice.
+
+See [tracking issue](https://github.com/64kramsystem/learn_bevy_ecs_by_ripping_off-code/issues/6) for the details (including fix); contributions are welcome 😁

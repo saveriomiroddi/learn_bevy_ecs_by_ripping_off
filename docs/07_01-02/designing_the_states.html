@@ -189,7 +189,7 @@ pub fn build_monster_scheduler() -&gt; Schedule {
 </code></pre>
 <h2 id="a-first-direct-translation"><a class="header" href="#a-first-direct-translation">A first, direct translation</a></h2>
 <p>In a direct transation, we create one stage for each transaction:</p>
-<table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
 <tr><td>get player input</td><td style="text-align: center">1</td><td style="text-align: center">1</td></tr>
 <tr><td>render player input</td><td style="text-align: center">1</td><td style="text-align: center">2</td></tr>
 <tr><td>handle player collisions</td><td style="text-align: center">2</td><td style="text-align: center">3</td></tr>
@@ -198,6 +198,7 @@ pub fn build_monster_scheduler() -&gt; Schedule {
 <tr><td>handle monster collisions</td><td style="text-align: center">3</td><td style="text-align: center">6</td></tr>
 <tr><td>render move monsters</td><td style="text-align: center">3</td><td style="text-align: center">7</td></tr>
 </tbody></table>
+</div>
 <p>All good! This can work, and it's a very straight model. Something important to keep in mind is that, in the game design, if the player doesn't press any key, the subsequent stages won't be executed!</p>
 <h2 id="simplifying-the-source-project-states"><a class="header" href="#simplifying-the-source-project-states">Simplifying the source project states</a></h2>
 <p>Now, let's look at the rendering systems: <code>map_render::map_render_system()</code> and <code>entity_render::entity_render_system()</code>; we notice two things:</p>
@@ -206,29 +207,32 @@ pub fn build_monster_scheduler() -&gt; Schedule {
 <li>they need to be run in their separate transaction, otherwise, they may render a partial state (this would be the equivalent of the &quot;read uncommitted&quot; transaction level in database systems).</li>
 </ol>
 <p>However, if we consider that this all happens over a single frame, we now see an opportunity for simplification: we just need to render only once! Let's have a look at the new table:</p>
-<table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
 <tr><td>get player input</td><td style="text-align: center">1</td><td style="text-align: center">1</td></tr>
 <tr><td>handle player collisions</td><td style="text-align: center">2</td><td style="text-align: center">2</td></tr>
 <tr><td>move monsters</td><td style="text-align: center">3</td><td style="text-align: center">3</td></tr>
 <tr><td>handle monster collisions</td><td style="text-align: center">3</td><td style="text-align: center">4</td></tr>
 <tr><td>render</td><td style="text-align: center">4</td><td style="text-align: center">5</td></tr>
 </tbody></table>
+</div>
 <p>We need a small modification here 😉 If the player doesn't send any input, the rendering won't be executed. Fortunately, we can shift the render:</p>
-<table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
 <tr><td>render</td><td style="text-align: center">4</td><td style="text-align: center">1</td></tr>
 <tr><td>get player input</td><td style="text-align: center">1</td><td style="text-align: center">2</td></tr>
 <tr><td>handle player collisions</td><td style="text-align: center">2</td><td style="text-align: center">3</td></tr>
 <tr><td>move monsters</td><td style="text-align: center">3</td><td style="text-align: center">4</td></tr>
 <tr><td>handle monster collisions</td><td style="text-align: center">3</td><td style="text-align: center">5</td></tr>
 </tbody></table>
+</div>
 <p>Excellent. From the user perspective, if we render at the beginning of a frame, or at the end of the previous one, it makes no difference - except that, with the former approach, we've solved the rendering problem.</p>
 <p>We can go further! we don't strictly need to sequentially render and get the player input in a sequence; this is a slow game, and rendering a tiny fraction of second after won't make any difference; the new plan is therefore:</p>
-<table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>stage description</th><th style="text-align: center">source scheduler number</th><th style="text-align: center">stage count</th></tr></thead><tbody>
 <tr><td>render+get player input</td><td style="text-align: center">4+1</td><td style="text-align: center">1</td></tr>
 <tr><td>handle player collisions</td><td style="text-align: center">2</td><td style="text-align: center">2</td></tr>
 <tr><td>move monsters</td><td style="text-align: center">3</td><td style="text-align: center">3</td></tr>
 <tr><td>handle monster collisions</td><td style="text-align: center">3</td><td style="text-align: center">4</td></tr>
 </tbody></table>
+</div>
 <p>Notice that when we talk about a tiny fraction of second, it not <em>one frame</em> of delay; the input/rendering systems are rendered in parallel (as opposed to in a sequence), so there is virtually zero delay.</p>
 <h2 id="summary-of-the-design"><a class="header" href="#summary-of-the-design">Summary of the design</a></h2>
 <p>With the design above, we now have 4 stages:</p>
